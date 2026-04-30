@@ -31,10 +31,11 @@ public class ListGraph<T> implements Graph<T> {
   public void remove(T node) {
       if (!vertices.remove(node)) {
         Collection<Edge<T>> edgesFromNode = getEdgesFrom(node);
+        ArrayList<T> destinationsFromEdge = new ArrayList<T>();
         for (Edge<T> edge : edgesFromNode) {
-          ArrayList<Node(T)>() nodesFromEdge = new ArrayList<>(edge.getNodes()); 
-          
-          disconnect(node, node2);
+          destinationsFromEdge.add(edge.getDestination());
+
+          disconnect(node, );
 
         }
         throw new NoSuchElementException();
