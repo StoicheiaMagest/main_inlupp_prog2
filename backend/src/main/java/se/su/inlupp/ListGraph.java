@@ -11,10 +11,11 @@ public class ListGraph<T> implements Graph<T> {
   }
 
   private class Node {
-    T name;
+    T value;
+    String name;
 
-    Node(T name){
-      this.name = name;
+    Node(T value){
+      this.value  = value;
     }
   }
 
@@ -31,7 +32,7 @@ public class ListGraph<T> implements Graph<T> {
       if (!vertices.remove(node)) {
         Collection<Edge<T>> edgesFromNode = getEdgesFrom(node);
         for (Edge<T> edge : edgesFromNode) {
-          ArrayList<node>() nodesFromEdge = new ArrayList<>(edge.getNodes()); 
+          ArrayList<Node(T)>() nodesFromEdge = new ArrayList<>(edge.getNodes()); 
           
           disconnect(node, node2);
 
@@ -84,5 +85,6 @@ public class ListGraph<T> implements Graph<T> {
   public Iterator<T> iterator() {
     throw new UnsupportedOperationException("Unimplemented method 'iterator'");
   }
+
 }
 
