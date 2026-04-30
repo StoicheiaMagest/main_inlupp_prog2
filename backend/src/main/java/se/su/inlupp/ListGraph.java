@@ -10,8 +10,12 @@ public class ListGraph<T> implements Graph<T> {
   public ListGraph() {
   }
 
-  private class LinkedList<Node<T>>() {
+  private class Node {
+    T name;
 
+    Node(T name){
+      this.name = name;
+    }
   }
 
   @Override // Add a vertex to the graph
