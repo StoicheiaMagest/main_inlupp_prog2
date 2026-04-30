@@ -1,19 +1,39 @@
 package se.su.inlupp;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 
 public class ListGraph<T> implements Graph<T> {
+  private List<T> vertices = new ArrayList<>(); // Store vertices
+  private List<List<Edge<T>>> neighbours = new ArrayList<>(); // Adjacency Edge lists
 
-  @Override
-  public void add(T node) {
-    throw new UnsupportedOperationException("Unimplemented method 'add'");
+  // construct an empty graph without parameters
+  public ListGraph() {
   }
 
-  @Override
+  private class LinkedList<Node<T>>() {
+
+  }
+
+  @Override // Add a vertex to the graph
+  public void add(T vertex) {
+    if (!vertices.contains(vertex)) {
+      vertices.add(vertex);
+      neighbours.add(new ArrayList<Edge<T>>());
+    }
+  }
+
+  @Override // Remove node and edges connected to that node
   public void remove(T node) {
-    throw new UnsupportedOperationException("Unimplemented method 'remove'");
+      if (!vertices.remove(node)) {
+        Collection<Edge<T>> edgesFromNode = getEdgesFrom(node);
+        for (Edge<T> edge : edgesFromNode) {
+          ArrayList<node>() nodesFromEdge = new ArrayList<>(edge.getNodes()); 
+          
+          disconnect(node, node2);
+
+        }
+        throw new NoSuchElementException();
+      }
   }
 
   @Override
@@ -38,6 +58,11 @@ public class ListGraph<T> implements Graph<T> {
 
   @Override
   public Set<T> getNodes() {
+    List<Integer> result = new ArrayList<>();
+    for  (Edge<T> e: neighbours.get(index)) {
+      result.add(e.v);
+    }
+    return result;
     throw new UnsupportedOperationException("Unimplemented method 'getNodes'");
   }
 
