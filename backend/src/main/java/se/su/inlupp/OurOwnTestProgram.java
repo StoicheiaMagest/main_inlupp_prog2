@@ -1,4 +1,4 @@
-package se.su.inlupp;
+/*package se.su.inlupp;
 
 public class OurOwnTestProgram {
 
@@ -28,4 +28,4 @@ public class OurOwnTestProgram {
         graph.remove(node3);
         System.out.println(graph);
     }
-}
+}*/

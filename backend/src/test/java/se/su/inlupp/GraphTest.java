@@ -37,7 +37,8 @@ public class GraphTest {
     VALID_NODE_1, VALID_NODE_2, "C", "D", "E", "F", VALID_NODE_3, "H", "I", "J", "X"
   };
 
-  
+  private final Graph<String> graph = new ListGraph<>();
+
   @Test
   @Order(0)
   @DisplayName("Information")
