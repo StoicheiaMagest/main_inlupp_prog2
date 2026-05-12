@@ -1,22 +1,25 @@
 package se.su.inlupp;
 
-public class EdgeClass<T> implements Edge<T> {    
+public class EdgeClass<T> implements Edge<T> {
     private T node1, node2;
     private String name;
     private int weight;
 
-    EdgeClass(T node1, T node2, String name, int weight){
+    EdgeClass(T node1, T node2, String name, int weight) {
         this.node1 = node1;
         this.node2 = node2;
         this.name = name;
-        this.weight = weight;
+        setWeight(weight);
     }
 
     public int getWeight() {
         return weight;
     }
 
-    public void setWeight(int weight){
+    public void setWeight(int weight) {
+        if (weight < 0) {
+            throw new IllegalArgumentException("Weight must not be negative");
+        }
         this.weight = weight;
     }
 
@@ -24,12 +27,12 @@ public class EdgeClass<T> implements Edge<T> {
         return node2;
     }
 
-    public String getName(){
+    public String getName() {
         return name;
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         return "till " + node2 + " med " + name + " tar " + weight;
     }
 }
