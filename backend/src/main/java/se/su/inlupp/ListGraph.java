@@ -98,6 +98,7 @@ public class ListGraph<T> implements Graph<T> {
       throw new IllegalArgumentException("Weight can´t be negative");
     }
     getEdgeBetween(node1, node2).setWeight(weight);
+    getEdgeBetween(node2, node1).setWeight(weight);
   }
 
   @Override

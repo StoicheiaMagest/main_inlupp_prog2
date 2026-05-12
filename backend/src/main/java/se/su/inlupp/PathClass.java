@@ -2,7 +2,7 @@ package se.su.inlupp;
 
 import java.util.*;
 
-public class PathClass<T> implements Path<T>, Iterable<Edge<T>>{
+public class PathClass<T> implements Path<T>{
     private List<Edge<T>> pathOfEdges = new ArrayList<>(); 
     private List<T> pathOfNodes = new ArrayList<>();
     
@@ -31,8 +31,8 @@ public class PathClass<T> implements Path<T>, Iterable<Edge<T>>{
         return Collections.unmodifiableList(copyOfPathOfNodes);
     }
 
-    /*@Override
+    @Override
     public Iterator<Edge<T>> iterator(){
-
-    }*/
+        return getEdges().iterator();
+    }
 }
