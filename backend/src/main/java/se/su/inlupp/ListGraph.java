@@ -91,7 +91,13 @@ public class ListGraph<T> implements Graph<T> {
 
   @Override
   public void setConnectionWeight(T node1, T node2, int weight) {
-    throw new UnsupportedOperationException("Unimplemented method 'setConnectionWeight'");
+    if(getEdgeBetween(node1, node2) == null){
+      throw new NoSuchElementException("Edge doesn't exist");
+    }
+    if (weight < 0) {
+      throw new IllegalArgumentException("Weight can´t be negative");
+    }
+    getEdgeBetween(node1, node2).setWeight(weight);
   }
 
   @Override
