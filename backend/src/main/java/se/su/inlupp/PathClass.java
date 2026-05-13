@@ -3,30 +3,35 @@ package se.su.inlupp;
 import java.util.*;
 
 public class PathClass<T> implements Path<T>{
-    private List<Edge<T>> pathOfEdges = new ArrayList<>(); 
-    private List<T> pathOfNodes = new ArrayList<>();
+    private List<Edge<T>> edges = new ArrayList<>(); 
+    private List<T> nodes = new ArrayList<>();
     
+    public PathClass(List<Edge<T>> edges, List<T> nodes){
+        this.edges = edges;
+        this.nodes = nodes;
+    }
+
     public T getStart(){
-        return pathOfNodes.getFirst();
+        return nodes.getFirst();
     }
 
     public T getEnd(){
-        return pathOfNodes.getLast();
+        return nodes.getLast();
     }
 
     public int getTotalWeight(){
-        return pathOfEdges.stream().mapToInt(e -> e.getWeight()).sum();
+        return edges.stream().mapToInt(e -> e.getWeight()).sum();
     }
 
 
     public List<Edge<T>> getEdges(){
-        List<Edge<T>> copyOfPathOfEdges = new ArrayList<>(pathOfEdges);
+        List<Edge<T>> copyOfPathOfEdges = new ArrayList<>(edges);
 
         return Collections.unmodifiableList(copyOfPathOfEdges);
     }
 
     public List<T> getNodes(){
-        List<T> copyOfPathOfNodes = new ArrayList<>(pathOfNodes);
+        List<T> copyOfPathOfNodes = new ArrayList<>(nodes);
 
         return Collections.unmodifiableList(copyOfPathOfNodes);
     }

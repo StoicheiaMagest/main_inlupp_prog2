@@ -9,7 +9,9 @@ public class DFSPathFinder<T> implements PathFinder<T> {
 
   @Override
   public Path<T> findPath(Graph<T> graph, T from, T to) {
-    Map<T, T> connections = new HashMap<>();
+    PathClass path = new PathClass<>();
+    
+    /*Map<T, T> connections = new HashMap<>();
     connect(from, null, connections);
     List<Edge<T>> path = getEdges(); //new LinkedList<>();
 
@@ -21,16 +23,16 @@ public class DFSPathFinder<T> implements PathFinder<T> {
       current = next;
     }
 
-    return path;
+    return path;*/
     throw new UnsupportedOperationException("Unimplemented method 'findPath'");
   }
 
-  private void connect(T to, T from, Map<T,T> connections) {
+  private void connect(T to, T from, Map<T,T> connections, Graph<T> graph) {
     connections.put(to, from);
-    for (Edge edge : T.get(to)) {
-      T destination = (T) edge.getDestination();
+    for (Edge<T> edge : graph.getEdgesFrom(to)) {
+      T destination = edge.getDestination();
       if (!connections.containsKey(destination)) {
-        connect(destination, to, connections);
+        connect(destination, to, connections, graph);
       }
     }
   }

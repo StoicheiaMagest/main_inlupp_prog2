@@ -67,8 +67,8 @@ public class ListGraph<T> implements Graph<T> {
     if (getEdgeBetween(node1, node2) != null) {
       throw new IllegalStateException("Edge " + name + " already exists");
     }
-    EdgeClass<T> edge1To2 = new EdgeClass<T>(node1, node2, name, weight);
-    EdgeClass<T> edge2To1 = new EdgeClass<T>(node2, node1, name, weight);
+    EdgeClass<T> edge1To2 = new EdgeClass<T>(node2, name, weight);
+    EdgeClass<T> edge2To1 = new EdgeClass<T>(node1, name, weight);
 
     neighbours.get(node1).add(edge1To2);
     neighbours.get(node2).add(edge2To1);

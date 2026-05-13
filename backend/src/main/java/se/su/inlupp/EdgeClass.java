@@ -1,12 +1,11 @@
 package se.su.inlupp;
 
 public class EdgeClass<T> implements Edge<T> {
-    private T node1, node2;
+    private T node2;
     private String name;
     private int weight;
 
-    EdgeClass(T node1, T node2, String name, int weight) {
-        this.node1 = node1;
+    EdgeClass(T node2, String name, int weight) {
         this.node2 = node2;
         this.name = name;
         setWeight(weight);
