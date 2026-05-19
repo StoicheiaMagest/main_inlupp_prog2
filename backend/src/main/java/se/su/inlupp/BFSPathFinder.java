@@ -10,6 +10,7 @@ public class BFSPathFinder<T> implements PathFinder<T> {
   public Path<T> findPath(Graph<T> graph, T from, T to) {
     Map<T, T> searchOrder = new HashMap<>();
     searchOrder.put(from, null);
+
     LinkedList<T> queue = new LinkedList<>();
 
     queue.add(from);
@@ -21,7 +22,7 @@ public class BFSPathFinder<T> implements PathFinder<T> {
         if (!searchOrder.containsKey(next)) {
           searchOrder.put(next, current);
           queue.add(next);
-        }
+        } 
       }      
     }
 
@@ -30,14 +31,17 @@ public class BFSPathFinder<T> implements PathFinder<T> {
     T current = to;
     while (current != null && !current.equals(from)) {
       T next = searchOrder.get(current);
+      if (next == null) {
+        return null;
+      }
       Edge<T> edge = graph.getEdgeBetween(next, current);
       path.addFirst(edge);
       current = next;
     }
 
-    List<T> nodes = path.stream()
+    LinkedList<T> nodes = new LinkedList<T>(path.stream()
                         .map(e -> e.getDestination())
-                        .toList();
+                        .toList());
 
     nodes.addFirst(from);
 
