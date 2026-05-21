@@ -1,35 +1,30 @@
 package se.su.inlupp;
 
-import java.util.Set;
-
 import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
-import javafx.scene.layout.VBox;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
+import javafx.scene.layout.GridPane;
 
 public class Gui extends Application {
 
-  private static final int NODE_RADIUS = 10;
+  private static final int NODE_RADIUS = 2;
 
   public void start(Stage stage) {
-    Graph<String> graph = new ListGraph<String>();
+    Graph<Location> graph = new ListGraph<>();
     OurOwnTestProgram.testMethod(graph);
-    String javaVersion = System.getProperty("java.version");
-    String javafxVersion = System.getProperty("javafx.version");
-    Label label = new Label("Hello, JavaFX " + javafxVersion + ", running on Java " + javaVersion + ".");
 
-    VBox root = new VBox(30, label);
-    root.setAlignment(Pos.CENTER);
-    // Set<String> nodeSet = graph.getNodes();
-    NodeGUI node = new NodeGUI("Arlanda", 0, 0);
-    int abscissa = node.getAbscissa();
-    int ordinate = node.getOrdinate();
-    Label arlanda = new Label(node.getName(), new Circle(abscissa, ordinate, NODE_RADIUS));
-    root.getChildren().add(arlanda);
-    Scene scene = new Scene(root, 640, 480);
+    GridPane root = new GridPane();
+    root.setPrefSize(1000, 1000);
+    for (Location location : graph.getNodes()) {
+      Label label = new Label(location.getName(), new Circle(location.getAbscissa(), location.getOrdinate(),
+          NODE_RADIUS));
+      root.add(label, location.getAbscissa(), location.getOrdinate());
+    }
+
+    Scene scene = new Scene(root, 1000, 1000);
     stage.setScene(scene);
     stage.show();
   }

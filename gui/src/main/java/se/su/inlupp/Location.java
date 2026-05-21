@@ -1,11 +1,11 @@
 package se.su.inlupp;
 
-public class NodeGUI implements Node<String> {
+public class Location implements Node<String>, Comparable<Location> {
     private String name;
     private int abscissa;
     private int ordinate;
 
-    public NodeGUI(String name, int abscissa, int ordinate) {
+    public Location(String name, int abscissa, int ordinate) {
         this.name = name;
         this.abscissa = abscissa;
         this.ordinate = ordinate;
@@ -31,4 +31,10 @@ public class NodeGUI implements Node<String> {
     public void setOrdinate(int ordinate) {
         this.ordinate = ordinate;
     }
+
+    @Override
+    public int compareTo(Location other) {
+        return this.name.compareTo(other.name);
+    }
+
 }
