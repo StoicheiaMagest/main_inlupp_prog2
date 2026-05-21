@@ -2,9 +2,9 @@ package se.su.inlupp;
 
 public class OurOwnTestProgram {
 
-    private static final Graph<String> graph = new ListGraph<>();
-    public static void main(String[] args){
-        String node1 = "1";
+    public static void testMethod(Graph<String> graph) {
+    
+        String node1 = "Centralen";
         String node2 = "2";
         String node3 = "3";
 
