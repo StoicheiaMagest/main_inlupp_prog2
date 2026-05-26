@@ -9,6 +9,8 @@ import javafx.stage.Stage;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Line;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Gui extends Application {
 
@@ -18,27 +20,36 @@ public class Gui extends Application {
     Graph<Location> graph = new ListGraph<>();
     OurOwnTestProgram.testMethod(graph);
 
+    Map<String, Location> locations = new HashMap<>();
+
     Pane root = new Pane();
     root.setPrefSize(500, 500);
 
-    Line line = new Line(10, 10, 100, 10);
-    line.setStrokeWidth(1);
-    root.getChildren().add(line);
-
-    for (Location location : graph.getNodes()) {
-      Label label = new Label(location.getName(), new Circle(NODE_RADIUS));
-      label.setLayoutX(location.getAbscissa());
-      label.setLayoutY(location.getOrdinate());
-      root.getChildren().add(label);
-      System.out.println(location.getAbscissa() + " " + location.getOrdinate());
-      System.out.println(label.getLayoutX() + " " + label.getLayoutY());
+    for (Location node : graph.getNodes()) {
+      locations.put(node.getName(), node);
+      Circle circle = new Circle(node.getAbscissa(), node.getOrdinate(), NODE_RADIUS);
+      Label location = new Label(node.getName(), circle);
+      location.setLayoutX(circle.getCenterX());
+      location.setLayoutY(circle.getCenterY());
+      for (Edge<Location> edge : graph.getEdgesFrom(node)) {
+        Line road = new Line(location.getLayoutX(), location.getLayoutY(), 
+                          edge.getDestination().getAbscissa(), edge.getDestination().getOrdinate());
+        root.getChildren().add(road);
+      }
+     
+      
+      root.getChildren().add(location);
     }
+    
+    BFSPathFinder<Location> bfs = new BFSPathFinder<>();
+
+    System.out.print("PATH" + " " + bfs.findPath(graph, locations.get("Arlanda"), locations.get("Skavsta")));
 
     Scene scene = new Scene(root, 500, 500);
     stage.setScene(scene);
     stage.show();
   }
-
+  
   public static void main(String[] args) {
     launch(args);
   }

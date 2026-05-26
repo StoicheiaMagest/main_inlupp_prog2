@@ -47,5 +47,11 @@ public class BFSPathFinder<T> implements PathFinder<T> {
 
     return new PathClass<T>(path, nodes);    
   }
+
+  @Override
+  public String toString() {
+    for (Edge<T> edge : path) {
+      System.out.print(path);
+  }
 }
 
