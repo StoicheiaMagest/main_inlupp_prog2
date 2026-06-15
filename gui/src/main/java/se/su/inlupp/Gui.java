@@ -22,23 +22,29 @@ public class Gui extends Application {
 
     Map<String, Location> locations = new HashMap<>();
 
-    Pane root = new Pane();
-    root.setPrefSize(500, 500);
+    BorderPane root = new BorderPane();
+    Pane pane = new Pane();
+    root.setCenter(pane);
+    pane.setPrefSize(500, 500);
 
     for (Location node : graph.getNodes()) {
       locations.put(node.getName(), node);
       Circle circle = new Circle(node.getAbscissa(), node.getOrdinate(), NODE_RADIUS);
-      Label location = new Label(node.getName(), circle);
+      Label label = new Label(node.getName());
+      label.setLayoutX(node.getAbscissa());
+      label.setLayoutY(node.getOrdinate());
+      /*Label location = new Label(node.getName(), circle);
       location.setLayoutX(circle.getCenterX());
-      location.setLayoutY(circle.getCenterY());
+      location.setLayoutY(circle.getCenterY());*/
       for (Edge<Location> edge : graph.getEdgesFrom(node)) {
-        Line road = new Line(location.getLayoutX(), location.getLayoutY(), 
+        Line road = new Line(label.getLayoutX(), label.getLayoutY(), 
                           edge.getDestination().getAbscissa(), edge.getDestination().getOrdinate());
-        root.getChildren().add(road);
+        pane.getChildren().add(road);
       }
      
       
-      root.getChildren().add(location);
+      pane.getChildren().add(circle);
+      pane.getChildren().add(label);
     }
     
     BFSPathFinder<Location> bfs = new BFSPathFinder<>();
