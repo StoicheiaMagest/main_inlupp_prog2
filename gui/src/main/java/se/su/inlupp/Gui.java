@@ -7,6 +7,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 import javafx.scene.layout.BorderPane;
@@ -14,35 +15,31 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Line;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.control.Label;;
+import javafx.scene.control.TextField;
+
 import java.util.HashMap;
 import java.util.Map;
+
 
 public class Gui extends Application {
   
   private static final int NODE_RADIUS = 2;
-  
+  Pane pane;
   
   Button addButton = new Button("Add Airport");
   Button saveButton = new Button("Save route");
   Button exitButton = new Button("Exit");
   VBox vBox = new VBox(10, addButton, saveButton, exitButton);
-  private class ButtonHandler implements EventHandler<ActionEvent>{
-    @Override
-    public void handle(ActionEvent actionEvent){
-      Object source = actionEvent.getSource();
-      
-      if (source == addButton){
-        
-      }
-    }
-  }
   
   public void start(Stage stage) {
-    Graph<Location> graph = new ListGraph<>();
+  Graph<Location> graph = new ListGraph<>();
   
   Map<String, Location> locations = new HashMap<>();
   BorderPane root = new BorderPane();
-  Pane pane = new Pane();
+  pane = new Pane();
   OurOwnTestProgram.testMethod(graph);
   
   root.setCenter(pane);
@@ -76,7 +73,39 @@ public class Gui extends Application {
     stage.setScene(scene);
     stage.show();
   }
+
+  private class ButtonHandler implements EventHandler<ActionEvent>{
+    @Override
+    public void handle(ActionEvent actionEvent){
+      Object source = actionEvent.getSource();
+      
+      if (source == addButton) {
+        pane.setOnMouseClicked(new ClickHandler());
+
+        
+      }
+    }
+  }
+
+  class ClickHandler implements EventHandler<MouseEvent> {
+    public void handle(MouseEvent event) {
+      double x = event.getX();
+      double y = event.getY();
+
+      
+      Location location = new Location(STYLESHEET_CASPIAN, NODE_RADIUS, NODE_RADIUS)
+    }
+  }
   
+  private class AddButtonHandler implements EventHandler<ActionEvent> {
+    @Override
+    public void handle(ActionEvent event) {
+      try {
+        
+      }
+    }
+  } 
+
   public static void main(String[] args) {
     launch(args);
   }
