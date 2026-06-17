@@ -11,6 +11,9 @@ public class Airport extends Pane implements Node<String>, Comparable<Airport> {
     private double abscissa;
     private double ordinate;
 
+    private double dragOffsetX;
+    private double dragOffsetY;
+
     public Airport(String name, double abscissa, double ordinate) {
         this.name = name;
         this.abscissa = abscissa;
@@ -37,17 +40,21 @@ public class Airport extends Pane implements Node<String>, Comparable<Airport> {
 
     class StartDragHandler implements EventHandler<MouseEvent> {
         public void handle(MouseEvent event) {
-              abscissa = event.getX();
-              ordinate = event.getY();
+              dragOffsetX = event.getX();
+              dragOffsetY = event.getY();
         }
     }
 
     class DragHandler implements EventHandler<MouseEvent> {
 
         public void handle(MouseEvent event) {
-            double newX = getLayoutX() + event.getX() - abscissa;
-            double newY = getLayoutY() + event.getY() - ordinate;
+            double newX = getLayoutX() + event.getX() - dragOffsetX;
+            double newY = getLayoutY() + event.getY() - dragOffsetY;
+
             relocate(newX, newY);
+
+            abscissa = newX;
+            ordinate = newY;
         }
     }
 
