@@ -2,11 +2,11 @@ package se.su.inlupp;
 
 public class OurOwnTestProgram {
 
-    public static void testMethod(Graph<Location> graph) {
+    public static void testMethod(Graph<Airport> graph) {
 
-        Location node1 = new Location("Arlanda", 400, 400);
-        Location node2 = new Location("Skavsta", 150, 40);
-        Location node3 = new Location("Bromma", 40, 39);
+        Airport node1 = new Airport("Arlanda", 400, 400);
+        Airport node2 = new Airport("Skavsta", 150, 40);
+        Airport node3 = new Airport("Bromma", 40, 39);
 
         graph.add(node1);
         graph.add(node3);
@@ -14,7 +14,7 @@ public class OurOwnTestProgram {
         graph.connect(node1, node2, "Edge(node1node2)", 4);
         graph.connect(node2, node3, "Edge(node2node3)", 4);
 
-        for (Edge<Location> e : graph.getEdgesFrom(node2)) {
+        for (Edge<Airport> e : graph.getEdgesFrom(node2)) {
             System.out.println(e.getName());
         }
 

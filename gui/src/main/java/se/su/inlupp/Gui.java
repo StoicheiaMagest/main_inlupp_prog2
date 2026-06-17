@@ -107,14 +107,13 @@ public class Gui extends Application {
       double x = event.getX();
       double y = event.getY();
 
-      public void removeAirport(Airport airport) {
-        Graph.remove(airport);
+      public void removeAirport(Airport airport(x, y)) {
+        Graph.remove(airport(x, y));
       }
-      
-
-
     }
   }
+  pane.getOnMouseClicked().handle(new RemoveAirportOnMapHandler().remove(airport(x, y)));
+
 
   private class PutAirportOnMapHandler implements EventHandler<MouseEvent> {
     public void handle(MouseEvent event) {

@@ -5,13 +5,13 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Circle;
 
-public class Location extends Pane implements Node<String>, Comparable<Location> {
+public class Airport extends Pane implements Node<String>, Comparable<Airport> {
     private static final int NODE_RADIUS = 4;
     private String name;
     private double abscissa;
     private double ordinate;
 
-    public Location(String name, double abscissa, double ordinate) {
+    public Airport(String name, double abscissa, double ordinate) {
         this.name = name;
         this.abscissa = abscissa;
         this.ordinate = ordinate;
@@ -80,7 +80,7 @@ public class Location extends Pane implements Node<String>, Comparable<Location>
     }
 
     @Override
-    public int compareTo(Location other) {
+    public int compareTo(Airport other) {
         return this.name.compareTo(other.name);
     }
 
