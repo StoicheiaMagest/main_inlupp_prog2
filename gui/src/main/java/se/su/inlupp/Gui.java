@@ -31,10 +31,11 @@ public class Gui extends Application {
   private Button addAirportButton, saveButton, exitButton, connectAirportsButton, removeAirportButton;
   private TextField airportNameField;
   private VBox vBox;
+  private Graph<Airport> graph;
 
   
   public void start(Stage stage) {
-    Graph<Airport> graph = new ListGraph<>();
+    graph = new ListGraph<>();
     airportNameField = new TextField();
     airportNameField.setPromptText("Enter airport name here");
     airportNameField.setDisable(true);
@@ -103,19 +104,32 @@ public class Gui extends Application {
   }
 
   class RemoveAirportOnMapHandler implements EventHandler<MouseEvent> {
+    @Override
     public void handle(MouseEvent event) {
       double x = event.getX();
       double y = event.getY();
 
-      public void removeAirport(Airport airport(x, y)) {
-        Graph.remove(airport(x, y));
+      Airport airportToRemove = findAirportAt(x, y);
+
+      if (airportToRemove != null) {
+          pane.getChildren().remove(airportToRemove);
+          graph.remove(airportToRemove);
+
+          // remove attached labels/lines too
       }
+      
+      /*public void removeAirport(Airport airport(x, y)) {
+        Graph.remove(airport(x, y));
+      }*/
+
+      pane.setOnMouseClicked(null);
     }
   }
-  pane.getOnMouseClicked().handle(new RemoveAirportOnMapHandler().remove(airport(x, y)));
+  //pane.getOnMouseClicked().handle(new RemoveAirportOnMapHandler().remove(airport(x, y)));
 
 
   private class PutAirportOnMapHandler implements EventHandler<MouseEvent> {
+    @Override
     public void handle(MouseEvent event) {
       double x = event.getX();
       double y = event.getY();
@@ -126,13 +140,29 @@ public class Gui extends Application {
         return;
       }
       
-      Airport location = new Airport(airportName, x, y);
-      pane.getChildren().add(location);
+      Airport airport = new Airport(airportName, x, y);
+      
+      graph.add(airport);
+      pane.getChildren().add(airport);
 
       airportNameField.clear();
       airportNameField.setDisable(true);
       pane.setOnMouseClicked(null);
     }
+  }
+
+  private Airport findAirportAt(double x, double y){
+    
+    for (Airport airport: graph.getNodes()){
+      double dx = airport.getAbscissa() - x;
+      double dy = airport.getOrdinate() - y;
+
+      if (Math.sqrt(dx * dx + dy * dy) <= NODE_RADIUS) {
+          return airport;
+      }
+    }
+
+    return null;
   }
 
   public static void main(String[] args) {
