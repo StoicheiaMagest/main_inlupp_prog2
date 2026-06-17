@@ -31,11 +31,10 @@ public class Gui extends Application {
   private Button addAirportButton, saveButton, exitButton, connectAirportsButton, removeAirportButton;
   private TextField airportNameField;
   private VBox vBox;
-  
-  
+
   
   public void start(Stage stage) {
-    Graph<Location> graph = new ListGraph<>();
+    Graph<Airport> graph = new ListGraph<>();
     airportNameField = new TextField();
     airportNameField.setPromptText("Enter airport name here");
     airportNameField.setDisable(true);
@@ -48,7 +47,7 @@ public class Gui extends Application {
     vBox = new VBox(10, airportNameField, addAirportButton, removeAirportButton,connectAirportsButton, saveButton, exitButton);
 
     
-    Map<String, Location> locations = new HashMap<>();
+    Map<String, Airport> airports = new HashMap<>();
     BorderPane root = new BorderPane();
     pane = new Pane();
     OurOwnTestProgram.testMethod(graph);
@@ -56,8 +55,8 @@ public class Gui extends Application {
     root.setCenter(pane);
     root.setLeft(vBox);
     pane.setPrefSize(500, 500);
-    for (Location node : graph.getNodes()) {
-      locations.put(node.getName(), node);
+    for (Airport node : graph.getNodes()) {
+      airports.put(node.getName(), node);
       Circle circle = new Circle(node.getAbscissa(), node.getOrdinate(), NODE_RADIUS);
         Label label = new Label(node.getName());
         label.setLayoutX(node.getAbscissa());
@@ -65,20 +64,19 @@ public class Gui extends Application {
         /*Label location = new Label(node.getName(), circle);
         location.setLayoutX(circle.getCenterX());
         location.setLayoutY(circle.getCenterY());*/
-        for (Edge<Location> edge : graph.getEdgesFrom(node)) {
+        for (Edge<Airport> edge : graph.getEdgesFrom(node)) {
           Line road = new Line(label.getLayoutX(), label.getLayoutY(), 
                             edge.getDestination().getAbscissa(), edge.getDestination().getOrdinate());
           pane.getChildren().add(road);
         }
-      
         
         pane.getChildren().add(circle);
         pane.getChildren().add(label);
       }
       
-      BFSPathFinder<Location> bfs = new BFSPathFinder<>();
+      BFSPathFinder<Airport> bfs = new BFSPathFinder<>();
 
-      System.out.print("PATH" + " " + bfs.findPath(graph, locations.get("Arlanda"), locations.get("Skavsta")));
+      System.out.print("PATH" + " " + bfs.findPath(graph, airports.get("Arlanda"), airports.get("Skavsta")));
 
       Scene scene = new Scene(root, 500, 500);
       stage.setScene(scene);
@@ -96,11 +94,25 @@ public class Gui extends Application {
         
       }
       if (source == removeAirportButton) {
-        
+        pane.setOnMouseClicked(new RemoveAirportOnMapHandler());
       }
       if (source == connectAirportsButton) {
 
       }
+    }
+  }
+
+  class RemoveAirportOnMapHandler implements EventHandler<MouseEvent> {
+    public void handle(MouseEvent event) {
+      double x = event.getX();
+      double y = event.getY();
+
+      public void removeAirport(Airport airport) {
+        Graph.remove(airport);
+      }
+      
+
+
     }
   }
 
@@ -115,7 +127,7 @@ public class Gui extends Application {
         return;
       }
       
-      Location location = new Location(airportName, x, y);
+      Airport location = new Airport(airportName, x, y);
       pane.getChildren().add(location);
 
       airportNameField.clear();

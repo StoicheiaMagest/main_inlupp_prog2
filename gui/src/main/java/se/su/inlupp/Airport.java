@@ -51,6 +51,13 @@ public class Location extends Pane implements Node<String>, Comparable<Location>
         }
     }
 
+    /*class DeleteHandler implements EventHandler<MouseEvent> {
+
+        public void handle(MouseEvent event) {
+            new RemoveAirportOnMapHandler();
+        }
+    }*/
+
     @Override
     public String getName() {
         return name;
