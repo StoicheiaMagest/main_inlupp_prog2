@@ -54,25 +54,10 @@ public class Gui extends Application {
     root.setCenter(pane);
     root.setLeft(vBox);
     pane.setPrefSize(500, 500);
-    for (Airport airport : graph.getNodes()) {
-
-      airport.addEventHandler(MouseEvent.MOUSE_PRESSED, e -> {
-
-        if (removeMode) {
-
-          Airport clickedAirport = (Airport) e.getSource();
-
-          pane.getChildren().remove(clickedAirport);
-          graph.remove(clickedAirport);
-
-          removeMode = false;
-
-          e.consume();
-        }
-      });
-
-      pane.getChildren().add(airport);
-    }
+ for (Airport airport : graph.getNodes()) {
+    addRemoveHandler(airport);
+    pane.getChildren().add(airport);
+}
 
     BFSPathFinder<Airport> bfs = new BFSPathFinder<>();
 
@@ -102,6 +87,24 @@ public class Gui extends Application {
     }
   }
 
+  //BYT UT LAMBDA-UTTEYCKEN I start() OCH PutAirportOnMapHandler
+  //GENOM ATT ANROPA DENNA METOD!
+private void addRemoveHandler(Airport airport) {
+
+    airport.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
+
+        if (removeMode) {
+
+            pane.getChildren().remove(airport);
+            graph.remove(airport);
+
+            removeMode = false;
+
+            e.consume();
+        }
+    });
+}
+
   /*
    * private class RemoveAirportHandler implements EventHandler<MouseEvent> {
    * 
@@ -130,25 +133,12 @@ public class Gui extends Application {
         return;
       }
 
-      Airport airport = new Airport(airportName, x, y);
+Airport airport = new Airport(airportName, x, y);
 
-      airport.addEventHandler(MouseEvent.MOUSE_PRESSED, e -> {
+addRemoveHandler(airport);
 
-        if (removeMode) {
-
-          Airport clickedAirport = (Airport) e.getSource();
-
-          pane.getChildren().remove(clickedAirport);
-          graph.remove(clickedAirport);
-
-          removeMode = false;
-
-          e.consume();
-        }
-      });
-
-      graph.add(airport);
-      pane.getChildren().add(airport);
+graph.add(airport);
+pane.getChildren().add(airport);
 
       airportNameField.clear();
       airportNameField.setDisable(true);

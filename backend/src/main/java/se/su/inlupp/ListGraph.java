@@ -21,38 +21,22 @@ public class ListGraph<T> implements Graph<T> {
     }
   }
 
-  @Override // Remove node and edges connected to that node
-  public void remove(T node) {
-    if (hasNode(node)) {
-
-      // Iterator<Edge<T>> iterator = neighbours.get(node).iterator();
-      for (Edge<T> e : getEdgesFrom(node)) {
-        T secondNodeToRemoveEdgeFrom = e.getDestination();
-        neighbours.get(node).remove(e);
-        neighbours.get(secondNodeToRemoveEdgeFrom).remove(getEdgeBetween(secondNodeToRemoveEdgeFrom, node));
-      } /*
-         * while(iterator.hasNext()){
-         * neighbours.get(node).remove(iterator.next());
-         * }
-         */
-
-      nodes.remove(node);
-      neighbours.remove(node);
-
-      /*
-       * Collection<Edge<T>> edgesFromNode = getEdgesFrom(node);
-       * ArrayList<T> destinationsFromEdge = new ArrayList<T>();
-       * for (Edge<T> edge : edgesFromNode) {
-       * destinationsFromEdge.add(edge.getDestination());
-       * 
-       * //disconnect(node, );
-       * 
-       * }
-       */
-    } else {
-      throw new NoSuchElementException();
+ @Override
+public void remove(T node) {
+    if (!hasNode(node)) {
+        throw new NoSuchElementException();
     }
-  }
+
+    for (Edge<T> edge : getEdgesFrom(node)) {
+        T destination = edge.getDestination();
+
+        neighbours.get(destination)
+                  .remove(getEdgeBetween(destination, node));
+    }
+
+    neighbours.remove(node);
+    nodes.remove(node);
+}
 
   @Override
   public boolean hasNode(T node) {
@@ -118,26 +102,21 @@ public class ListGraph<T> implements Graph<T> {
     return Collections.unmodifiableCollection(copyOfEdges);
   }
 
-  @Override
-  public Edge<T> getEdgeBetween(T node1, T node2) {
-    // neighbours.get(neighbours.indexOf(node2))
+ @Override
+public Edge<T> getEdgeBetween(T node1, T node2) {
+
     if (!(hasNode(node1) && hasNode(node2))) {
-      throw new NoSuchElementException("Node1 or node2 doesn't exist");
+        throw new NoSuchElementException();
     }
 
-    /*
-     * if(!(getEdgesFrom(node1).contains(neighbours.get(node2).equals(node1)))) {
-     * return null;
-     * } else {
-     */
     for (Edge<T> e : getEdgesFrom(node1)) {
-      if (e.getDestination() == node2) {
-        return e;
-      }
+        if (e.getDestination().equals(node2)) {
+            return e;
+        }
     }
+
     return null;
-    // }
-  }
+}
 
   @Override
   public Iterator<T> iterator() {
