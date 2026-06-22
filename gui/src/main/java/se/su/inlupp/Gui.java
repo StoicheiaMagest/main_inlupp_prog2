@@ -13,8 +13,6 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.scene.control.Alert;
-import javafx.scene.control.ToggleButton;
-import javafx.scene.control.ToggleGroup;
 
 public class Gui extends Application {
 
@@ -38,6 +36,7 @@ public class Gui extends Application {
     airportNameField.setDisable(true);
 
     addAirportButton = new ToggleButton("Add Airport");
+
     connectAirportsButton = new ToggleButton("Connect Airports");
     removeAirportButton = new ToggleButton("Remove Airport");
     useBFSAlgorithmButton = new ToggleButton("Use BFS algorithm");
@@ -64,9 +63,15 @@ public class Gui extends Application {
         loadMapButton,
         exitButton);
 
-    //ToggleButton.setToggleGroup(tools);
-    //eraseButton.setToggleGroup(tools);
-    //moveButton.setToggleGroup(tools);
+    addAirportButton.setToggleGroup(tools);
+    removeAirportButton.setToggleGroup(tools);
+    connectAirportsButton.setToggleGroup(tools);
+    useBFSAlgorithmButton.setToggleGroup(tools);
+    useDFSAlgorithmButton.setToggleGroup(tools);
+    showRouteButton.setToggleGroup(tools);
+    loadRouteButton.setToggleGroup(tools);
+    saveRouteButton.setToggleGroup(tools);
+    exitButton.setToggleGroup(tools);
 
     pane = new Pane();
     pane.setPrefSize(500, 500);
@@ -113,6 +118,8 @@ public class Gui extends Application {
 
       if (airportName == null || airportName.strip().isEmpty()) {
         showErrorMessage("The textfield can not be empty");
+        airportNameField.setDisable(true);
+        pane.setOnMouseClicked(null);
         return;
       }
 
