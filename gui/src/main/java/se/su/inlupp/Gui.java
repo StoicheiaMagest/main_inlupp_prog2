@@ -4,25 +4,30 @@ import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.control.ToggleGroup;
 
 public class Gui extends Application {
 
   private Pane pane;
-  private Button addAirportButton, saveRouteButton, exitButton, connectAirportsButton, removeAirportButton,
+  private ToggleButton addAirportButton, saveRouteButton, exitButton, connectAirportsButton, removeAirportButton,
       useBFSAlgorithmButton, useDFSAlgorithmButton, showRouteButton, loadRouteButton, loadMapButton;
   private TextField airportNameField;
 
   private Graph<Airport> graph;
 
   private boolean removeMode;
+
+  private ToggleGroup tools = new ToggleGroup();
 
   @Override
   public void start(Stage stage) {
@@ -32,16 +37,16 @@ public class Gui extends Application {
     airportNameField.setPromptText("Enter airport name here");
     airportNameField.setDisable(true);
 
-    addAirportButton = new Button("Add Airport");
-    connectAirportsButton = new Button("Connect Airports");
-    removeAirportButton = new Button("Remove Airport");
-    useBFSAlgorithmButton = new Button("Use BFS algorithm");
-    useDFSAlgorithmButton = new Button("Use DFS algorithm");
-    showRouteButton = new Button("Show route");
-    loadRouteButton = new Button("Load route");
-    saveRouteButton = new Button("Save route");
-    loadMapButton = new Button("Load Map");
-    exitButton = new Button("Exit");
+    addAirportButton = new ToggleButton("Add Airport");
+    connectAirportsButton = new ToggleButton("Connect Airports");
+    removeAirportButton = new ToggleButton("Remove Airport");
+    useBFSAlgorithmButton = new ToggleButton("Use BFS algorithm");
+    useDFSAlgorithmButton = new ToggleButton("Use DFS algorithm");
+    showRouteButton = new ToggleButton("Show route");
+    loadRouteButton = new ToggleButton("Load route");
+    saveRouteButton = new ToggleButton("Save route");
+    loadMapButton = new ToggleButton("Load Map");
+    exitButton = new ToggleButton("Exit");
 
     addAirportButton.setOnAction(new ButtonHandler());
     removeAirportButton.setOnAction(new ButtonHandler());
@@ -58,6 +63,10 @@ public class Gui extends Application {
         saveRouteButton,
         loadMapButton,
         exitButton);
+
+    //ToggleButton.setToggleGroup(tools);
+    //eraseButton.setToggleGroup(tools);
+    //moveButton.setToggleGroup(tools);
 
     pane = new Pane();
     pane.setPrefSize(500, 500);
