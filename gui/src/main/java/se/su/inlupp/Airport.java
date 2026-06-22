@@ -6,7 +6,11 @@ import javafx.scene.layout.Pane;
 import javafx.scene.shape.Circle;
 
 public class Airport extends Pane implements Node<String>, Comparable<Airport> {
+
     private static final int NODE_RADIUS = 4;
+
+    private static boolean removeMode = false;
+
     private String name;
     private double abscissa;
     private double ordinate;
@@ -20,7 +24,6 @@ public class Airport extends Pane implements Node<String>, Comparable<Airport> {
         this.ordinate = ordinate;
 
         Circle circle = new Circle(NODE_RADIUS);
-
         Label label = new Label(name);
 
         circle.setCenterX(NODE_RADIUS);
@@ -33,21 +36,37 @@ public class Airport extends Pane implements Node<String>, Comparable<Airport> {
 
         relocate(abscissa, ordinate);
 
-        setOnMousePressed(new StartDragHandler());
-        setOnMouseDragged(new DragHandler());
-
+        setOnMousePressed(new MousePressedHandler());
+        setOnMouseDragged(new MouseDraggedHandler());
     }
 
-    class StartDragHandler implements EventHandler<MouseEvent> {
+    public static void setRemoveMode(boolean mode) {
+        removeMode = mode;
+    }
+
+    private class MousePressedHandler implements EventHandler<MouseEvent> {
+        @Override
         public void handle(MouseEvent event) {
-              dragOffsetX = event.getX();
-              dragOffsetY = event.getY();
+
+            if (removeMode) {
+                Pane parent = (Pane) getParent();
+                parent.getChildren().remove(Airport.this);
+
+                event.consume();
+                return;
+            }
+
+            dragOffsetX = event.getX();
+            dragOffsetY = event.getY();
         }
     }
 
-    class DragHandler implements EventHandler<MouseEvent> {
-
+    private class MouseDraggedHandler implements EventHandler<MouseEvent> {
+        @Override
         public void handle(MouseEvent event) {
+
+            if (removeMode) return;
+
             double newX = getLayoutX() + event.getX() - dragOffsetX;
             double newY = getLayoutY() + event.getY() - dragOffsetY;
 
@@ -57,13 +76,6 @@ public class Airport extends Pane implements Node<String>, Comparable<Airport> {
             ordinate = newY;
         }
     }
-
-    /*class DeleteHandler implements EventHandler<MouseEvent> {
-
-        public void handle(MouseEvent event) {
-            new RemoveAirportOnMapHandler();
-        }
-    }*/
 
     @Override
     public String getName() {
@@ -78,17 +90,8 @@ public class Airport extends Pane implements Node<String>, Comparable<Airport> {
         return ordinate;
     }
 
-    public void setAbscissa(int abscissa) {
-        this.abscissa = abscissa;
-    }
-
-    public void setOrdinate(int ordinate) {
-        this.ordinate = ordinate;
-    }
-
     @Override
     public int compareTo(Airport other) {
         return this.name.compareTo(other.name);
     }
-
 }
