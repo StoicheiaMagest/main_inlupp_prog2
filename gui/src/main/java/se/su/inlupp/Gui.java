@@ -103,48 +103,79 @@ public class Gui extends Application {
         removeMode = true;
         Airport.setRemoveMode(true);
       }
-    }
-  }
 
-  private class PutAirportOnMapHandler implements EventHandler<MouseEvent> {
-
-    @Override
-    public void handle(MouseEvent event) {
-
-      double x = event.getX();
-      double y = event.getY();
-
-      String airportName = airportNameField.getText();
-
-      if (airportName == null || airportName.strip().isEmpty()) {
-        showErrorMessage("The textfield can not be empty");
-        airportNameField.setDisable(true);
-        pane.setOnMouseClicked(null);
-        return;
+      if (source == connectAirportsButton) {
+        pane.setOnMouseClicked(new ConnectAirportsHandler());
       }
-
-      Airport airport = new Airport(airportName, x, y);
-
-      graph.add(airport);
-      pane.getChildren().add(airport);
-
-      airportNameField.clear();
-      airportNameField.setDisable(true);
-
-      pane.setOnMouseClicked(null);
     }
-  }
 
-  public void showErrorMessage(String message) {
-    Alert alert = new Alert(Alert.AlertType.ERROR);
-    alert.setTitle("Error");
-    alert.setHeaderText("An error occurred");
-    alert.setContentText(message);
+    private class ConnectAirportsHandler implements EventHandler<MouseEvent> {
 
-    alert.showAndWait();
-  }
+      private Airport firstAirport;
 
-  public static void main(String[] args) {
-    launch(args);
+      @Override
+      public void handle(MouseEvent event) {
+
+        if (!(event.getTarget() instanceof Airport airport)) {
+          return;
+        }
+
+        if (firstAirport == null) {
+          firstAirport = airport;
+        } else {
+
+          Airport secondAirport = airport;
+          graph.connect(firstAirport, secondAirport, firstAirport.getName() + "-" + secondAirport.getName(), 1);
+
+          //pane.getChildren().add(line);
+
+          firstAirport = null;
+
+          pane.setOnMouseClicked(null); // lämna mode
+        }
+      }
+    }
+
+    private class PutAirportOnMapHandler implements EventHandler<MouseEvent> {
+
+      @Override
+      public void handle(MouseEvent event) {
+
+        double x = event.getX();
+        double y = event.getY();
+
+        String airportName = airportNameField.getText();
+
+        if (airportName == null || airportName.strip().isEmpty()) {
+          showErrorMessage("The textfield can not be empty");
+          airportNameField.setDisable(true);
+          pane.setOnMouseClicked(null);
+          return;
+        }
+
+        Airport airport = new Airport(airportName, x, y);
+
+        graph.add(airport);
+        pane.getChildren().add(airport);
+
+        airportNameField.clear();
+        airportNameField.setDisable(true);
+
+        pane.setOnMouseClicked(null);
+      }
+    }
+
+    public void showErrorMessage(String message) {
+      Alert alert = new Alert(Alert.AlertType.ERROR);
+      alert.setTitle("Error");
+      alert.setHeaderText("An error occurred");
+      alert.setContentText(message);
+
+      alert.showAndWait();
+    }
+
+    public static void main(String[] args) {
+      launch(args);
+    }
   }
 }

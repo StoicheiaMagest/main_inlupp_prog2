@@ -1,4 +1,5 @@
 package se.su.inlupp;
+
 import javafx.event.EventHandler;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
@@ -12,16 +13,12 @@ public class Airport extends Pane implements Node<String>, Comparable<Airport> {
     private static boolean removeMode = false;
 
     private String name;
-    private double abscissa;
-    private double ordinate;
 
     private double dragOffsetX;
     private double dragOffsetY;
 
-    public Airport(String name, double abscissa, double ordinate) {
+    public Airport(String name, double x, double y) {
         this.name = name;
-        this.abscissa = abscissa;
-        this.ordinate = ordinate;
 
         Circle circle = new Circle(NODE_RADIUS);
         Label label = new Label(name);
@@ -34,7 +31,8 @@ public class Airport extends Pane implements Node<String>, Comparable<Airport> {
 
         getChildren().addAll(circle, label);
 
-        relocate(abscissa, ordinate);
+        setLayoutX(x);
+        setLayoutY(y);
 
         setOnMousePressed(new MousePressedHandler());
         setOnMouseDragged(new MouseDraggedHandler());
@@ -65,15 +63,11 @@ public class Airport extends Pane implements Node<String>, Comparable<Airport> {
         @Override
         public void handle(MouseEvent event) {
 
-            if (removeMode) return;
+            if (removeMode)
+                return;
 
-            double newX = getLayoutX() + event.getX() - dragOffsetX;
-            double newY = getLayoutY() + event.getY() - dragOffsetY;
-
-            relocate(newX, newY);
-
-            abscissa = newX;
-            ordinate = newY;
+            setLayoutX(getLayoutX() + event.getX() - dragOffsetX);
+            setLayoutY(getLayoutY() + event.getY() - dragOffsetY);
         }
     }
 
@@ -82,16 +76,16 @@ public class Airport extends Pane implements Node<String>, Comparable<Airport> {
         return name;
     }
 
-    public double getAbscissa() {
-        return abscissa;
+    public double getX() {
+        return getLayoutX();
     }
 
-    public double getOrdinate() {
-        return ordinate;
+    public double getY() {
+        return getLayoutY();
     }
 
     @Override
     public int compareTo(Airport other) {
-        return this.name.compareTo(other.name);
+        return name.compareTo(other.name);
     }
 }
