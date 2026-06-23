@@ -18,10 +18,11 @@ public class EdgeGUI {
 
         this.line = new Line();
 
-        line.startXProperty().bind(from.centerXProperty());
-        line.startYProperty().bind(from.centerYProperty());
-        line.endXProperty().bind(to.centerXProperty());
-        line.endYProperty().bind(to.centerYProperty());
+        line.startXProperty().bind(from.layoutXProperty());
+        line.startYProperty().bind(from.layoutYProperty());
+
+        line.endXProperty().bind(to.layoutXProperty());
+        line.endYProperty().bind(to.layoutYProperty());
     }
 
     public Line getLine() {
