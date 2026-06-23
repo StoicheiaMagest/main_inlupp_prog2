@@ -88,4 +88,8 @@ public class Airport extends Pane implements Node<String>, Comparable<Airport> {
     public int compareTo(Airport other) {
         return name.compareTo(other.name);
     }
+
+    public int getRadius(){
+        return NODE_RADIUS;
+    }
 }

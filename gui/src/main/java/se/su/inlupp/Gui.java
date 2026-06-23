@@ -49,6 +49,7 @@ public class Gui extends Application {
 
     addAirportButton.setOnAction(new ButtonHandler());
     removeAirportButton.setOnAction(new ButtonHandler());
+    connectAirportsButton.setOnAction(new ButtonHandler());
 
     VBox vBox = new VBox(10,
         airportNameField,
@@ -109,73 +110,102 @@ public class Gui extends Application {
       }
     }
 
-    private class ConnectAirportsHandler implements EventHandler<MouseEvent> {
+  }
+  private class ConnectAirportsHandler implements EventHandler<MouseEvent> {
 
-      private Airport firstAirport;
+    private Airport firstAirport;
 
-      @Override
-      public void handle(MouseEvent event) {
+    @Override
+    public void handle(MouseEvent event) {
 
-        if (!(event.getTarget() instanceof Airport airport)) {
-          return;
+        javafx.scene.Node target =
+                (javafx.scene.Node) event.getTarget();
+
+        while (target != null && !(target instanceof Airport)) {
+            target = target.getParent();
         }
+
+        if (!(target instanceof Airport)) {
+            return;
+        }
+
+        Airport airport = (Airport) target;
 
         if (firstAirport == null) {
-          firstAirport = airport;
-        } else {
-
-          Airport secondAirport = airport;
-          graph.connect(firstAirport, secondAirport, firstAirport.getName() + "-" + secondAirport.getName(), 1);
-
-          //pane.getChildren().add(line);
-
-          firstAirport = null;
-
-          pane.setOnMouseClicked(null); // lämna mode
-        }
-      }
-    }
-
-    private class PutAirportOnMapHandler implements EventHandler<MouseEvent> {
-
-      @Override
-      public void handle(MouseEvent event) {
-
-        double x = event.getX();
-        double y = event.getY();
-
-        String airportName = airportNameField.getText();
-
-        if (airportName == null || airportName.strip().isEmpty()) {
-          showErrorMessage("The textfield can not be empty");
-          airportNameField.setDisable(true);
-          pane.setOnMouseClicked(null);
-          return;
+            firstAirport = airport;
+            return;
         }
 
-        Airport airport = new Airport(airportName, x, y);
+        Airport secondAirport = airport;
 
-        graph.add(airport);
-        pane.getChildren().add(airport);
+        if (firstAirport == secondAirport) {
+            return;
+        }
 
-        airportNameField.clear();
-        airportNameField.setDisable(true);
+        graph.connect(
+                firstAirport,
+                secondAirport,
+                firstAirport.getName()
+                        + "-"
+                        + secondAirport.getName(),
+                1);
+
+        EdgeGUI edge = new EdgeGUI(
+                firstAirport,
+                secondAirport,
+                firstAirport.getName()
+                        + "-"
+                        + secondAirport.getName(),
+                1
+        );
+
+        pane.getChildren().add(0, edge);
+
+        firstAirport = null;
 
         pane.setOnMouseClicked(null);
+    }
+}
+
+  private class PutAirportOnMapHandler implements EventHandler<MouseEvent> {
+
+    @Override
+    public void handle(MouseEvent event) {
+
+      double x = event.getX();
+      double y = event.getY();
+
+      String airportName = airportNameField.getText();
+
+      if (airportName == null || airportName.strip().isEmpty()) {
+        showErrorMessage("The textfield can not be empty");
+        airportNameField.setDisable(true);
+        pane.setOnMouseClicked(null);
+        return;
       }
-    }
 
-    public void showErrorMessage(String message) {
-      Alert alert = new Alert(Alert.AlertType.ERROR);
-      alert.setTitle("Error");
-      alert.setHeaderText("An error occurred");
-      alert.setContentText(message);
+      Airport airport = new Airport(airportName, x, y);
 
-      alert.showAndWait();
-    }
+      graph.add(airport);
+      pane.getChildren().add(airport);
 
-    public static void main(String[] args) {
-      launch(args);
+      airportNameField.clear();
+      airportNameField.setDisable(true);
+
+      pane.setOnMouseClicked(null);
     }
+  }
+
+  public void showErrorMessage(String message) {
+    Alert alert = new Alert(Alert.AlertType.ERROR);
+    alert.setTitle("Error");
+    alert.setHeaderText("An error occurred");
+    alert.setContentText(message);
+
+    alert.showAndWait();
+  }
+
+  public static void main(String[] args) {
+    launch(args);
   }
 }
