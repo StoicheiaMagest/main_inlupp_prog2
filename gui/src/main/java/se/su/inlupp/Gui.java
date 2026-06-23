@@ -111,6 +111,7 @@ public class Gui extends Application {
     }
 
   }
+
   private class ConnectAirportsHandler implements EventHandler<MouseEvent> {
 
     private Airport firstAirport;
@@ -118,54 +119,52 @@ public class Gui extends Application {
     @Override
     public void handle(MouseEvent event) {
 
-        javafx.scene.Node target =
-                (javafx.scene.Node) event.getTarget();
+      javafx.scene.Node target = (javafx.scene.Node) event.getTarget();
 
-        while (target != null && !(target instanceof Airport)) {
-            target = target.getParent();
-        }
+      while (target != null && !(target instanceof Airport)) {
+        target = target.getParent();
+      }
 
-        if (!(target instanceof Airport)) {
-            return;
-        }
+      if (!(target instanceof Airport)) {
+        return;
+      }
 
-        Airport airport = (Airport) target;
+      Airport airport = (Airport) target;
 
-        if (firstAirport == null) {
-            firstAirport = airport;
-            return;
-        }
+      if (firstAirport == null) {
+        firstAirport = airport;
+        return;
+      }
 
-        Airport secondAirport = airport;
+      Airport secondAirport = airport;
 
-        if (firstAirport == secondAirport) {
-            return;
-        }
+      if (firstAirport == secondAirport) {
+        return;
+      }
 
-        graph.connect(
-                firstAirport,
-                secondAirport,
-                firstAirport.getName()
-                        + "-"
-                        + secondAirport.getName(),
-                1);
+      graph.connect(
+          firstAirport,
+          secondAirport,
+          firstAirport.getName()
+              + "-"
+              + secondAirport.getName(),
+          1);
 
-        EdgeGUI edge = new EdgeGUI(
-                firstAirport,
-                secondAirport,
-                firstAirport.getName()
-                        + "-"
-                        + secondAirport.getName(),
-                1
-        );
+      EdgeGUI edge = new EdgeGUI(
+          firstAirport,
+          secondAirport,
+          firstAirport.getName()
+              + "-"
+              + secondAirport.getName(),
+          1);
 
-        pane.getChildren().add(0, edge);
+      pane.getChildren().add(0, edge);
 
-        firstAirport = null;
+      firstAirport = null;
 
-        pane.setOnMouseClicked(null);
+      pane.setOnMouseClicked(null);
     }
-}
+  }
 
   private class PutAirportOnMapHandler implements EventHandler<MouseEvent> {
 
@@ -184,7 +183,7 @@ public class Gui extends Application {
         return;
       }
 
-      Airport airport = new Airport(airportName, x, y);
+      Airport airport = new Airport(airportName, x, y, Gui.this);
 
       graph.add(airport);
       pane.getChildren().add(airport);
@@ -203,6 +202,20 @@ public class Gui extends Application {
     alert.setContentText(message);
 
     alert.showAndWait();
+  }
+
+  public void removeAirport(Airport airport) {
+
+    // Ta bort alla EdgeGUI som är kopplade
+    pane.getChildren().removeIf(node -> node instanceof EdgeGUI edge &&
+        (edge.getFrom() == airport ||
+            edge.getTo() == airport));
+
+    // Ta bort airport grafiskt
+    pane.getChildren().remove(airport);
+
+    // Ta bort från grafen
+    graph.remove(airport);
   }
 
   public static void main(String[] args) {

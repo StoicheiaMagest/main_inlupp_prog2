@@ -14,10 +14,13 @@ public class Airport extends Pane implements Node<String>, Comparable<Airport> {
 
     private String name;
 
+    private Gui gui;
+
     private double dragOffsetX;
     private double dragOffsetY;
 
-    public Airport(String name, double x, double y) {
+    public Airport(String name, double x, double y, Gui gui) {
+        this.gui = gui;
         this.name = name;
 
         Circle circle = new Circle(NODE_RADIUS);
@@ -47,11 +50,12 @@ public class Airport extends Pane implements Node<String>, Comparable<Airport> {
         public void handle(MouseEvent event) {
 
             if (removeMode) {
-                Pane parent = (Pane) getParent();
-                parent.getChildren().remove(Airport.this);
+                if (removeMode) {
+                    gui.removeAirport(Airport.this);
 
-                event.consume();
-                return;
+                    event.consume();
+                    return;
+                }
             }
 
             dragOffsetX = event.getX();
@@ -89,7 +93,7 @@ public class Airport extends Pane implements Node<String>, Comparable<Airport> {
         return name.compareTo(other.name);
     }
 
-    public int getRadius(){
+    public int getRadius() {
         return NODE_RADIUS;
     }
 }
