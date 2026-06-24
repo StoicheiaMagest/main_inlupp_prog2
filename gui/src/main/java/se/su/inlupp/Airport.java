@@ -4,6 +4,8 @@ import javafx.event.EventHandler;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
 
 public class Airport extends Pane implements Node<String>, Comparable<Airport> {
@@ -16,6 +18,9 @@ public class Airport extends Pane implements Node<String>, Comparable<Airport> {
 
     private Gui gui;
 
+    Circle circle;
+    Label label;
+
     private double dragOffsetX;
     private double dragOffsetY;
 
@@ -23,8 +28,8 @@ public class Airport extends Pane implements Node<String>, Comparable<Airport> {
         this.gui = gui;
         this.name = name;
 
-        Circle circle = new Circle(NODE_RADIUS);
-        Label label = new Label(name);
+        circle = new Circle(NODE_RADIUS);
+        label = new Label(name);
 
         circle.setCenterX(NODE_RADIUS);
         circle.setCenterY(NODE_RADIUS);
@@ -95,5 +100,9 @@ public class Airport extends Pane implements Node<String>, Comparable<Airport> {
 
     public int getRadius() {
         return NODE_RADIUS;
+    }
+
+    public void setColor(Color color){
+        circle.setFill(color);
     }
 }

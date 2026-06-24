@@ -1,6 +1,7 @@
 package se.su.inlupp;
 
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 
 public class EdgeGUI extends Pane implements Edge<Airport> {
@@ -61,4 +62,8 @@ public class EdgeGUI extends Pane implements Edge<Airport> {
     public String getName() {
         return name;
     };
+
+    public void setColor(Color color){
+        line.setStroke(color);
+    }
 }

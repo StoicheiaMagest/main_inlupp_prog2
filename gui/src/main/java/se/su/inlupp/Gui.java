@@ -12,6 +12,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.scene.control.Alert;
 import java.util.LinkedHashSet;
@@ -21,14 +22,22 @@ import java.util.Set;
 public class Gui extends Application {
 
   private Pane pane;
-  private ToggleButton addAirportButton, saveRouteButton, exitButton, connectAirportsButton, removeAirportButton,
+  private ToggleButton addAirportButton, saveRouteButton, exitButton, connectAirportsButton, removeAirportButton, removeColorButton,
       useBFSAlgorithmButton, useDFSAlgorithmButton, showRouteButton, loadRouteButton, loadMapButton;
   private TextField airportNameField;
 
   private Graph<Airport> graph;
+  private List<EdgeGUI> flights;
+  private DFSPathFinder<Airport> dfsPathFinder = new DFSPathFinder<>();
+  private BFSPathFinder<Airport> bfsPathFinder = new BFSPathFinder<>();
 
   private boolean removeMode;
   private boolean DFSMode;
+
+  private Airport firstAirport;
+  private Airport secondAirport;
+
+  private Color color;
 
   private ToggleGroup tools = new ToggleGroup();
 
@@ -44,6 +53,7 @@ public class Gui extends Application {
 
     connectAirportsButton = new ToggleButton("Connect Airports");
     removeAirportButton = new ToggleButton("Remove Airport");
+    removeColorButton = new ToggleButton("Remove Color");
     useBFSAlgorithmButton = new ToggleButton("Use BFS algorithm");
     useDFSAlgorithmButton = new ToggleButton("Use DFS algorithm");
     showRouteButton = new ToggleButton("Show route");
@@ -54,6 +64,7 @@ public class Gui extends Application {
 
     addAirportButton.setOnAction(new ButtonHandler());
     removeAirportButton.setOnAction(new ButtonHandler());
+    removeColorButton.setOnAction(new ButtonHandler());
     connectAirportsButton.setOnAction(new ButtonHandler());
     useBFSAlgorithmButton.setOnAction(new ButtonHandler());
     useDFSAlgorithmButton.setOnAction(new ButtonHandler());
@@ -67,6 +78,7 @@ public class Gui extends Application {
         airportNameField,
         addAirportButton,
         removeAirportButton,
+        removeColorButton,
         connectAirportsButton,
         useBFSAlgorithmButton,
         useDFSAlgorithmButton,
@@ -78,12 +90,14 @@ public class Gui extends Application {
 
     addAirportButton.setToggleGroup(tools);
     removeAirportButton.setToggleGroup(tools);
+    removeColorButton.setToggleGroup(tools);
     connectAirportsButton.setToggleGroup(tools);
     useBFSAlgorithmButton.setToggleGroup(tools);
     useDFSAlgorithmButton.setToggleGroup(tools);
     showRouteButton.setToggleGroup(tools);
     loadRouteButton.setToggleGroup(tools);
     saveRouteButton.setToggleGroup(tools);
+    loadMapButton.setToggleGroup(tools);
     exitButton.setToggleGroup(tools);
 
     pane = new Pane();
@@ -105,16 +119,21 @@ public class Gui extends Application {
 
       Object source = event.getSource();
 
+      removeMode = false;
+      Airport.setRemoveMode(false);
+
       if (source == addAirportButton) {
         airportNameField.setDisable(false);
         pane.setOnMouseClicked(new PutAirportOnMapHandler());
-        removeMode = false;
-        Airport.setRemoveMode(false);
       }
 
       if (source == removeAirportButton) {
         removeMode = true;
         Airport.setRemoveMode(true);
+      }
+
+      if (source == removeColorButton) {
+        removeColor();
       }
 
       if (source == connectAirportsButton) {
@@ -132,7 +151,7 @@ public class Gui extends Application {
       if (source == showRouteButton) {
         pane.setOnMouseClicked(new ShowRouteHandler());
       }
-      
+
       if (source == exitButton) {
         Platform.exit();
       }
@@ -141,45 +160,46 @@ public class Gui extends Application {
   }
 
   private class ShowRouteHandler implements EventHandler<MouseEvent> {
+
     @Override
     public void handle(MouseEvent event) {
-      if (DFSMode) {
-          
-        } else {
 
+      if (!selectAirports(event)) {
+        return;
+      }
+
+      Path<Airport> path;
+
+      if (DFSMode) {
+        path = dfsPathFinder.findPath(graph, firstAirport, secondAirport);
+        color = Color.BLUE;
+
+      } else {
+        path = bfsPathFinder.findPath(graph, firstAirport, secondAirport);
+        color = Color.RED;
+      }
+
+      List<Airport> airports = path.getNodes();
+      List<Edge<Airport>> flights = path.getEdges();
+
+      for (Airport airport : airports) {
+        airport.setColor(color);
+      }
+
+      for (Edge<Airport> flight : flights) {
+        if (flight instanceof EdgeGUI) {
+          ((EdgeGUI) flight).setColor(color);
         }
+      }
     }
-    
   }
 
   private class ConnectAirportsHandler implements EventHandler<MouseEvent> {
 
-    private Airport firstAirport;
-    private Airport secondAirport;
-
     @Override
     public void handle(MouseEvent event) {
 
-      javafx.scene.Node target = (javafx.scene.Node) event.getTarget();
-
-      while (target != null && !(target instanceof Airport)) {
-        target = target.getParent();
-      }
-
-      if (!(target instanceof Airport)) {
-        return;
-      }
-
-      Airport airport = (Airport) target;
-
-      if (firstAirport == null) {
-        firstAirport = airport;
-        return;
-      }
-
-      secondAirport = airport;
-
-      if (firstAirport == secondAirport) {
+      if (!selectAirports(event)) {
         return;
       }
 
@@ -199,6 +219,7 @@ public class Gui extends Application {
               + secondAirport.getName(),
           1);
 
+      flights.add(edge);
       pane.getChildren().add(0, edge);
 
       firstAirport = null;
@@ -251,6 +272,11 @@ public class Gui extends Application {
     pane.getChildren().removeIf(node -> node instanceof EdgeGUI edge &&
         (edge.getFrom() == airport ||
             edge.getTo() == airport));
+    
+    // Tar bort alla flights som är kopplade
+    flights.removeIf(node -> node instanceof EdgeGUI edge &&
+        (edge.getFrom() == airport ||
+            edge.getTo() == airport));
 
     // Ta bort airport grafiskt
     pane.getChildren().remove(airport);
@@ -259,11 +285,42 @@ public class Gui extends Application {
     graph.remove(airport);
   }
 
-  private Set<Airport> selectAirports(MouseEvent event) {
-    Set<Airport> airports = new LinkedHashSet<Airport>() {
+  private boolean selectAirports(MouseEvent event) {
 
-    };
-    return List.of(firstAirport, secondAirport);
+    javafx.scene.Node target = (javafx.scene.Node) event.getTarget();
+
+    while (target != null && !(target instanceof Airport)) {
+      target = target.getParent();
+    }
+
+    if (!(target instanceof Airport)) {
+      return false;
+    }
+
+    Airport airport = (Airport) target;
+
+    if (firstAirport == null) {
+      firstAirport = airport;
+      return false;
+    }
+
+    secondAirport = airport;
+
+    if (firstAirport == secondAirport) {
+      secondAirport = null;
+      return false;
+    }
+
+    return true;
+  }
+
+  private void removeColor(){
+    for (Airport airport: graph){
+      airport.setColor(Color.BLACK);
+    }
+    for (EdgeGUI flight: flights){
+      flight.setColor(Color.BLACK);
+    }
   }
 
   public static void main(String[] args) {
