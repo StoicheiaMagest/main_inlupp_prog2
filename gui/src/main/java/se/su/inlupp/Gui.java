@@ -1,6 +1,7 @@
 package se.su.inlupp;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
@@ -13,6 +14,9 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.scene.control.Alert;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
 public class Gui extends Application {
 
@@ -24,6 +28,7 @@ public class Gui extends Application {
   private Graph<Airport> graph;
 
   private boolean removeMode;
+  private boolean DFSMode;
 
   private ToggleGroup tools = new ToggleGroup();
 
@@ -50,6 +55,13 @@ public class Gui extends Application {
     addAirportButton.setOnAction(new ButtonHandler());
     removeAirportButton.setOnAction(new ButtonHandler());
     connectAirportsButton.setOnAction(new ButtonHandler());
+    useBFSAlgorithmButton.setOnAction(new ButtonHandler());
+    useDFSAlgorithmButton.setOnAction(new ButtonHandler());
+    showRouteButton.setOnAction(new ButtonHandler());
+    loadRouteButton.setOnAction(new ButtonHandler());
+    saveRouteButton.setOnAction(new ButtonHandler());
+    loadMapButton.setOnAction(new ButtonHandler());
+    exitButton.setOnAction(new ButtonHandler());
 
     VBox vBox = new VBox(10,
         airportNameField,
@@ -108,13 +120,42 @@ public class Gui extends Application {
       if (source == connectAirportsButton) {
         pane.setOnMouseClicked(new ConnectAirportsHandler());
       }
+
+      if (source == useBFSAlgorithmButton) {
+        DFSMode = false;
+      }
+
+      if (source == useDFSAlgorithmButton) {
+        DFSMode = true;
+      }
+
+      if (source == showRouteButton) {
+        pane.setOnMouseClicked(new ShowRouteHandler());
+      }
+      
+      if (source == exitButton) {
+        Platform.exit();
+      }
     }
 
+  }
+
+  private class ShowRouteHandler implements EventHandler<MouseEvent> {
+    @Override
+    public void handle(MouseEvent event) {
+      if (DFSMode) {
+          
+        } else {
+
+        }
+    }
+    
   }
 
   private class ConnectAirportsHandler implements EventHandler<MouseEvent> {
 
     private Airport firstAirport;
+    private Airport secondAirport;
 
     @Override
     public void handle(MouseEvent event) {
@@ -136,7 +177,7 @@ public class Gui extends Application {
         return;
       }
 
-      Airport secondAirport = airport;
+      secondAirport = airport;
 
       if (firstAirport == secondAirport) {
         return;
@@ -216,6 +257,13 @@ public class Gui extends Application {
 
     // Ta bort från grafen
     graph.remove(airport);
+  }
+
+  private Set<Airport> selectAirports(MouseEvent event) {
+    Set<Airport> airports = new LinkedHashSet<Airport>() {
+
+    };
+    return List.of(firstAirport, secondAirport);
   }
 
   public static void main(String[] args) {
