@@ -13,8 +13,10 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Label;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -28,6 +30,7 @@ public class Gui extends Application {
       removeColorButton,
       useBFSAlgorithmButton, useDFSAlgorithmButton, showRouteButton, loadRouteButton, loadMapButton;
   private TextField airportNameField;
+  private Label weightLabel;
 
   private Graph<Airport> graph;
   private List<EdgeGUI> flights;
@@ -52,6 +55,8 @@ public class Gui extends Application {
     airportNameField = new TextField();
     airportNameField.setPromptText("Enter airport name here");
     airportNameField.setDisable(true);
+
+    weightLabel = new Label();
 
     addAirportButton = new ToggleButton("Add Airport");
     connectAirportsButton = new ToggleButton("Connect Airports");
@@ -89,6 +94,7 @@ public class Gui extends Application {
         loadRouteButton,
         saveRouteButton,
         loadMapButton,
+        weightLabel,
         exitButton);
 
     addAirportButton.setToggleGroup(tools);
@@ -181,6 +187,11 @@ public class Gui extends Application {
         path = bfsPathFinder.findPath(graph, firstAirport, secondAirport);
         color = Color.RED;
       }
+      if (path == null) {
+        firstAirport = null;
+        secondAirport = null;
+        return;
+      }
 
       List<Airport> airports = path.getNodes();
       List<Edge<Airport>> flightsInPath = path.getEdges();
@@ -193,11 +204,25 @@ public class Gui extends Application {
 
         for (EdgeGUI flight : flights) {
 
-          if (flight.getTo() == flightInPath.getDestination()) {
+          if (flight.getName().equals(flightInPath.getName())) {
             flight.setColor(color);
           }
+          /*
+           * if (flight.getFrom() == () && flight.getTo() ==
+           * flightInPath.getDestination()) {
+           * flight.setColor(color);
+           * }
+           */
         }
       }
+
+      String algorithm = DFSMode ? "DFS" : "BFS";
+
+      weightLabel
+          .setText("Total weight for path using " + algorithm + ": " + path.getTotalWeight() + "\n" + path.getEdges());
+
+      firstAirport = null;
+      secondAirport = null;
     }
   }
 
@@ -230,6 +255,7 @@ public class Gui extends Application {
       pane.getChildren().add(0, edge);
 
       firstAirport = null;
+      secondAirport = null;
 
       pane.setOnMouseClicked(null);
     }
