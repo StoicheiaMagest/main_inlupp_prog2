@@ -15,6 +15,8 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.scene.control.Alert;
+
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -22,7 +24,8 @@ import java.util.Set;
 public class Gui extends Application {
 
   private Pane pane;
-  private ToggleButton addAirportButton, saveRouteButton, exitButton, connectAirportsButton, removeAirportButton, removeColorButton,
+  private ToggleButton addAirportButton, saveRouteButton, exitButton, connectAirportsButton, removeAirportButton,
+      removeColorButton,
       useBFSAlgorithmButton, useDFSAlgorithmButton, showRouteButton, loadRouteButton, loadMapButton;
   private TextField airportNameField;
 
@@ -44,18 +47,18 @@ public class Gui extends Application {
   @Override
   public void start(Stage stage) {
     graph = new ListGraph<>();
+    flights = new ArrayList<>();
 
     airportNameField = new TextField();
     airportNameField.setPromptText("Enter airport name here");
     airportNameField.setDisable(true);
 
     addAirportButton = new ToggleButton("Add Airport");
-
     connectAirportsButton = new ToggleButton("Connect Airports");
     removeAirportButton = new ToggleButton("Remove Airport");
     removeColorButton = new ToggleButton("Remove Color");
-    useBFSAlgorithmButton = new ToggleButton("Use BFS algorithm");
-    useDFSAlgorithmButton = new ToggleButton("Use DFS algorithm");
+    useBFSAlgorithmButton = new ToggleButton("Use BFS algorithm [RED]");
+    useDFSAlgorithmButton = new ToggleButton("Use DFS algorithm [BLUE]");
     showRouteButton = new ToggleButton("Show route");
     loadRouteButton = new ToggleButton("Load route");
     saveRouteButton = new ToggleButton("Save route");
@@ -180,15 +183,19 @@ public class Gui extends Application {
       }
 
       List<Airport> airports = path.getNodes();
-      List<Edge<Airport>> flights = path.getEdges();
+      List<Edge<Airport>> flightsInPath = path.getEdges();
 
       for (Airport airport : airports) {
         airport.setColor(color);
       }
 
-      for (Edge<Airport> flight : flights) {
-        if (flight instanceof EdgeGUI) {
-          ((EdgeGUI) flight).setColor(color);
+      for (Edge<Airport> flightInPath : flightsInPath) {
+
+        for (EdgeGUI flight : flights) {
+
+          if (flight.getTo() == flightInPath.getDestination()) {
+            flight.setColor(color);
+          }
         }
       }
     }
@@ -272,7 +279,7 @@ public class Gui extends Application {
     pane.getChildren().removeIf(node -> node instanceof EdgeGUI edge &&
         (edge.getFrom() == airport ||
             edge.getTo() == airport));
-    
+
     // Tar bort alla flights som är kopplade
     flights.removeIf(node -> node instanceof EdgeGUI edge &&
         (edge.getFrom() == airport ||
@@ -283,6 +290,7 @@ public class Gui extends Application {
 
     // Ta bort från grafen
     graph.remove(airport);
+    // pane.setOnMouseClicked(null);
   }
 
   private boolean selectAirports(MouseEvent event) {
@@ -314,11 +322,11 @@ public class Gui extends Application {
     return true;
   }
 
-  private void removeColor(){
-    for (Airport airport: graph){
+  private void removeColor() {
+    for (Airport airport : graph) {
       airport.setColor(Color.BLACK);
     }
-    for (EdgeGUI flight: flights){
+    for (EdgeGUI flight : flights) {
       flight.setColor(Color.BLACK);
     }
   }

@@ -55,12 +55,10 @@ public class Airport extends Pane implements Node<String>, Comparable<Airport> {
         public void handle(MouseEvent event) {
 
             if (removeMode) {
-                if (removeMode) {
-                    gui.removeAirport(Airport.this);
+                gui.removeAirport(Airport.this);
 
-                    event.consume();
-                    return;
-                }
+                event.consume();
+                return;
             }
 
             dragOffsetX = event.getX();
@@ -102,7 +100,7 @@ public class Airport extends Pane implements Node<String>, Comparable<Airport> {
         return NODE_RADIUS;
     }
 
-    public void setColor(Color color){
+    public void setColor(Color color) {
         circle.setFill(color);
     }
 }
