@@ -161,6 +161,18 @@ public class Gui extends Application {
         pane.setOnMouseClicked(new ShowRouteHandler());
       }
 
+      if (source == loadMapButton) {
+
+      }
+
+      if (source == saveRouteButton) {
+        
+      }
+
+      if (source == loadMapButton) {
+
+      }
+
       if (source == exitButton) {
         Platform.exit();
       }
