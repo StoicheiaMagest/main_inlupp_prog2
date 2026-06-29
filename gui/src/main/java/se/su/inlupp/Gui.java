@@ -17,11 +17,17 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 
+import java.security.Key;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 
 public class Gui extends Application {
 
@@ -29,7 +35,7 @@ public class Gui extends Application {
   private ToggleButton addAirportButton, saveRouteButton, exitButton, connectAirportsButton, removeAirportButton,
       removeColorButton,
       useBFSAlgorithmButton, useDFSAlgorithmButton, showRouteButton, loadRouteButton, loadMapButton;
-  private TextField airportNameField;
+  private TextField textField;
   private Label weightLabel;
 
   private Graph<Airport> graph;
@@ -47,14 +53,20 @@ public class Gui extends Application {
 
   private ToggleGroup tools = new ToggleGroup();
 
+  private Image image = new Image("https://m.media-amazon.com/images/I/71Z115aCqqL._AC_SL1500_.jpg");
+
+  private BorderPane root;
+  
+  private ImageView imageView = new ImageView(image);
+
   @Override
   public void start(Stage stage) {
     graph = new ListGraph<>();
     flights = new ArrayList<>();
 
-    airportNameField = new TextField();
-    airportNameField.setPromptText("Enter airport name here");
-    airportNameField.setDisable(true);
+    textField = new TextField();
+    textField.setPromptText("Press button and enter text");
+    textField.setDisable(true);
 
     weightLabel = new Label();
 
@@ -83,7 +95,7 @@ public class Gui extends Application {
     exitButton.setOnAction(new ButtonHandler());
 
     VBox vBox = new VBox(10,
-        airportNameField,
+        textField,
         addAirportButton,
         removeAirportButton,
         removeColorButton,
@@ -111,8 +123,9 @@ public class Gui extends Application {
 
     pane = new Pane();
     pane.setPrefSize(500, 500);
+    pane.getChildren().add(imageView);
 
-    BorderPane root = new BorderPane();
+    root = new BorderPane();
     root.setCenter(pane);
     root.setLeft(vBox);
 
@@ -132,7 +145,8 @@ public class Gui extends Application {
       Airport.setRemoveMode(false);
 
       if (source == addAirportButton) {
-        airportNameField.setDisable(false);
+        textField.setPromptText("Enter airport name here");
+        textField.setDisable(false);
         pane.setOnMouseClicked(new PutAirportOnMapHandler());
       }
 
@@ -162,11 +176,13 @@ public class Gui extends Application {
       }
 
       if (source == loadMapButton) {
-
+        textField.setPromptText("URL for background image");
+        textField.setDisable(false);
+        textField.setOnKeyPressed(new LoadMapHandler());
       }
 
       if (source == saveRouteButton) {
-        
+
       }
 
       if (source == loadMapButton) {
@@ -219,19 +235,13 @@ public class Gui extends Application {
           if (flight.getName().equals(flightInPath.getName())) {
             flight.setColor(color);
           }
-          /*
-           * if (flight.getFrom() == () && flight.getTo() ==
-           * flightInPath.getDestination()) {
-           * flight.setColor(color);
-           * }
-           */
         }
       }
 
       String algorithm = DFSMode ? "DFS" : "BFS";
 
       weightLabel
-          .setText("Total weight for path using " + algorithm + ": " + path.getTotalWeight() + "\n" + path.getEdges());
+          .setText("Total weight for path using " + algorithm + ": " + path.getTotalWeight());
 
       firstAirport = null;
       secondAirport = null;
@@ -281,11 +291,11 @@ public class Gui extends Application {
       double x = event.getX();
       double y = event.getY();
 
-      String airportName = airportNameField.getText();
+      String airportName = textField.getText();
 
       if (airportName == null || airportName.strip().isEmpty()) {
         showErrorMessage("The textfield can not be empty");
-        airportNameField.setDisable(true);
+        textField.setDisable(true);
         pane.setOnMouseClicked(null);
         return;
       }
@@ -295,10 +305,22 @@ public class Gui extends Application {
       graph.add(airport);
       pane.getChildren().add(airport);
 
-      airportNameField.clear();
-      airportNameField.setDisable(true);
+      textField.clear();
+      textField.setDisable(true);
 
       pane.setOnMouseClicked(null);
+    }
+  }
+
+  private class LoadMapHandler implements EventHandler<KeyEvent>{
+    
+    @Override
+    public void handle(KeyEvent event) {
+      if (event.getCode() == KeyCode.ENTER) {
+        imageView.setImage(new Image(textField.getText()));
+        textField.clear();
+        textField.setDisable(true);
+      }
     }
   }
 
