@@ -21,6 +21,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
 
+import java.io.Serializable;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -31,6 +32,8 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import javafx.geometry.Rectangle2D;
+import javafx.stage.Screen;
 
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -65,9 +68,9 @@ public class Gui extends Application {
 
   private ImageView imageView = new ImageView(image);
 
-  /*private FileChooser fileChooser = new FileChooser();
+  private FileChooser fileChooser = new FileChooser();
 
-  private Stage stage;*/
+  private Stage stage;
 
   @Override
   public void start(Stage stage) {
@@ -139,8 +142,22 @@ public class Gui extends Application {
     root.setCenter(pane);
     root.setLeft(vBox);
 
-    Scene scene = new Scene(root, 500, 500);
+    Scene scene = new Scene(root, 800, 800);
     stage.setScene(scene);
+    Rectangle2D screen = Screen.getPrimary().getVisualBounds();
+
+    double maxWidth = screen.getWidth() * 0.9;
+    double maxHeight = screen.getHeight() * 0.9;
+
+    if (image.getWidth() > maxWidth || image.getHeight() > maxHeight){
+      imageView.setFitWidth(maxWidth);
+      imageView.setFitHeight(maxHeight);
+      imageView.setPreserveRatio(true);
+    }
+
+    stage.sizeToScene();
+    //imageView.fitWidthProperty().bind(stage.widthProperty());
+    //imageView.fitHeightProperty().bind(stage.heightProperty());
     stage.show();
   }
 
@@ -192,7 +209,7 @@ public class Gui extends Application {
       }
 
       if (source == saveRouteButton) {
-        //new SaveHandler();
+        new SaveHandler().handle(event);
       }
 
       if (source == loadMapButton) {
@@ -283,9 +300,8 @@ public class Gui extends Application {
               + secondAirport.getName(),
           1);
 
-
       edge.setMouseTransparent(true);
-      
+
       flights.add(edge);
       pane.getChildren().add(edge);
 
@@ -336,17 +352,16 @@ public class Gui extends Application {
       }
     }
   }
-  
-  /*private class SaveHandler implements EventHandler<ActionEvent> {
+
+  private class SaveHandler implements EventHandler<ActionEvent> {
     @Override
     public void handle(ActionEvent event) {
-      weightLabel.setText("SAVE");
       File file = fileChooser.showSaveDialog(stage);
       if (file != null) {
         save(file.getAbsolutePath());
       }
     }
-  } */
+  }
 
   public void showErrorMessage(String message) {
     Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -414,13 +429,11 @@ public class Gui extends Application {
       flight.setColor(Color.BLACK);
     }
   }
-
   /*private void save(String fileName) {
     try {
       FileOutputStream file = new FileOutputStream(fileName);
       ObjectOutputStream out = new ObjectOutputStream(file);
       out.writeObject(graph.getNodes());
-      out.writeObject("\n");
       out.writeObject(flights);
       out.close();
       file.close();
@@ -428,10 +441,55 @@ public class Gui extends Application {
       Alert alert = new Alert(Alert.AlertType.ERROR, "Can't open file!");
       alert.showAndWait();
     } catch (IOException e) {
-      Alert alert = new Alert(Alert.AlertType.ERROR, "IO-error " + e.getMessage());
+      e.printStackTrace();
+
+      Alert alert = new Alert(
+          Alert.AlertType.ERROR,
+          "IO-error " + e.getMessage());
       alert.showAndWait();
     }
-  }*/
+  } */
+  private void save(String fileName) {
+
+    try (FileOutputStream file = new FileOutputStream(fileName);
+        ObjectOutputStream out = new ObjectOutputStream(file)) {
+
+      List<AirportData> airportsData = new ArrayList<>();
+
+      for (Airport airport : graph.getNodes()) {
+        airportsData.add(
+            new AirportData(
+                airport.getName(),
+                airport.getX(),
+                airport.getY()));
+      }
+
+      List<FlightData> flightsData = new ArrayList<>();
+
+      for (EdgeGUI flight : flights) {
+        flightsData.add(
+            new FlightData(
+                flight.getName(),
+                flight.getFrom().getName(),
+                flight.getTo().getName(), 
+                flight.getWeight()));
+      }
+
+      out.writeObject(airportsData);
+      out.writeObject(flightsData);
+
+    } catch (FileNotFoundException e) {
+      Alert alert = new Alert(Alert.AlertType.ERROR, "Can't open file!");
+      alert.showAndWait();
+    } catch (IOException e) {
+      e.printStackTrace();
+
+      Alert alert = new Alert(Alert.AlertType.ERROR,
+          "IO-error " + e.getMessage());
+
+      alert.showAndWait();
+    }
+  }
 
   public static void main(String[] args) {
     launch(args);
