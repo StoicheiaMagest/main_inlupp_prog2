@@ -19,7 +19,13 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.stage.FileChooser;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.security.Key;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -56,8 +62,12 @@ public class Gui extends Application {
   private Image image = new Image("https://m.media-amazon.com/images/I/71Z115aCqqL._AC_SL1500_.jpg");
 
   private BorderPane root;
-  
+
   private ImageView imageView = new ImageView(image);
+
+  /*private FileChooser fileChooser = new FileChooser();
+
+  private Stage stage;*/
 
   @Override
   public void start(Stage stage) {
@@ -182,7 +192,7 @@ public class Gui extends Application {
       }
 
       if (source == saveRouteButton) {
-
+        //new SaveHandler();
       }
 
       if (source == loadMapButton) {
@@ -273,8 +283,11 @@ public class Gui extends Application {
               + secondAirport.getName(),
           1);
 
+
+      edge.setMouseTransparent(true);
+      
       flights.add(edge);
-      pane.getChildren().add(0, edge);
+      pane.getChildren().add(edge);
 
       firstAirport = null;
       secondAirport = null;
@@ -312,8 +325,8 @@ public class Gui extends Application {
     }
   }
 
-  private class LoadMapHandler implements EventHandler<KeyEvent>{
-    
+  private class LoadMapHandler implements EventHandler<KeyEvent> {
+
     @Override
     public void handle(KeyEvent event) {
       if (event.getCode() == KeyCode.ENTER) {
@@ -323,6 +336,17 @@ public class Gui extends Application {
       }
     }
   }
+  
+  /*private class SaveHandler implements EventHandler<ActionEvent> {
+    @Override
+    public void handle(ActionEvent event) {
+      weightLabel.setText("SAVE");
+      File file = fileChooser.showSaveDialog(stage);
+      if (file != null) {
+        save(file.getAbsolutePath());
+      }
+    }
+  } */
 
   public void showErrorMessage(String message) {
     Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -390,6 +414,24 @@ public class Gui extends Application {
       flight.setColor(Color.BLACK);
     }
   }
+
+  /*private void save(String fileName) {
+    try {
+      FileOutputStream file = new FileOutputStream(fileName);
+      ObjectOutputStream out = new ObjectOutputStream(file);
+      out.writeObject(graph.getNodes());
+      out.writeObject("\n");
+      out.writeObject(flights);
+      out.close();
+      file.close();
+    } catch (FileNotFoundException e) {
+      Alert alert = new Alert(Alert.AlertType.ERROR, "Can't open file!");
+      alert.showAndWait();
+    } catch (IOException e) {
+      Alert alert = new Alert(Alert.AlertType.ERROR, "IO-error " + e.getMessage());
+      alert.showAndWait();
+    }
+  }*/
 
   public static void main(String[] args) {
     launch(args);
