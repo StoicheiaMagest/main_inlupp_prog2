@@ -24,6 +24,7 @@ import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
 
 import java.io.Serializable;
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -207,6 +208,11 @@ public class Gui extends Application {
       }
 
       if (source == loadFlightsButton) {
+        for (Airport airport : graph.getNodes()){
+          graph.remove(airport);
+        }
+        pane.getChildren().clear();
+        flights.clear();
         new LoadHandler().handle(event);
       }
 
@@ -286,7 +292,7 @@ public class Gui extends Application {
               + secondAirport.getName(),
           1);
 
-      Flight edge = new Flight(
+      Flight flight = new Flight(
           firstAirport,
           secondAirport,
           firstAirport.getName()
@@ -294,10 +300,10 @@ public class Gui extends Application {
               + secondAirport.getName(),
           1);
 
-      edge.setMouseTransparent(true);
+      flight.setMouseTransparent(true);
 
-      flights.add(edge);
-      pane.getChildren().add(edge);
+      flights.add(flight);
+      pane.getChildren().add(flight);
 
       firstAirport = null;
       secondAirport = null;
@@ -382,14 +388,14 @@ public class Gui extends Application {
   public void removeAirport(Airport airport) {
 
     // Ta bort alla Flight som är kopplade
-    pane.getChildren().removeIf(node -> node instanceof Flight edge &&
-        (edge.getFrom() == airport ||
-            edge.getTo() == airport));
+    pane.getChildren().removeIf(node -> node instanceof Flight flight &&
+        (flight.getFrom() == airport ||
+            flight.getTo() == airport));
 
     // Tar bort alla flights som är kopplade
-    flights.removeIf(node -> node instanceof Flight edge &&
-        (edge.getFrom() == airport ||
-            edge.getTo() == airport));
+    flights.removeIf(node -> node instanceof Flight flight &&
+        (flight.getFrom() == airport ||
+            flight.getTo() == airport));
 
     // Ta bort airport grafiskt
     pane.getChildren().remove(airport);
@@ -463,14 +469,14 @@ public class Gui extends Application {
                 flight.getWeight()));
       }
 
-      for (AirportData airportData : airportsData){
+      for (AirportData airportData : airportsData) {
         out.writeObject(airportData);
       }
-      for (FlightData flightData : flightsData){
+      for (FlightData flightData : flightsData) {
         out.writeObject(flightData);
       }
-      //out.writeObject(airportsData);
-      //out.writeObject(flightsData);
+      // out.writeObject(airportsData);
+      // out.writeObject(flightsData);
 
       out.close();
       file.close();
@@ -515,34 +521,38 @@ public class Gui extends Application {
       FileInputStream file = new FileInputStream(fileName);
       ObjectInputStream in = new ObjectInputStream(file);
 
-      Airport airportFrom = null;
-      Airport airportTo = null;
-
-      while (true){
-        if ((in.readObject() instanceof AirportData airportData)) {
-          Airport airport = new Airport(airportData.getName(), airportData.getX(), airportData.getY(), Gui.this);
-          graph.add(airport);
-          pane.getChildren().add(airport);
-        } else if (in.readObject() instanceof FlightData flightData) {
-          for (Airport airport : graph.getNodes()) {
-            if (flightData.getFrom().equals(airport.getName())) {
-              airportFrom = airport;
-            } else if (flightData.getTo().equals(airport.getName())) {
-              airportTo = airport;
+      
+      while (true) {
+        try {
+          Object dataObject = in.readObject();
+          
+          if ((dataObject instanceof AirportData airportData)) {
+            Airport airport = new Airport(airportData.getName(), airportData.getX(), airportData.getY(), Gui.this);
+            graph.add(airport);
+            pane.getChildren().add(airport);
+          } else if (dataObject instanceof FlightData flightData) {
+            Airport airportFrom = null;
+            Airport airportTo = null;
+            for (Airport airport : graph.getNodes()) {
+              if (flightData.getFrom().equals(airport.getName())) {
+                airportFrom = airport;
+              } else if (flightData.getTo().equals(airport.getName())) {
+                airportTo = airport;
+              }
             }
+            graph.connect(airportFrom, airportTo, flightData.getName(), flightData.getWeight());
+            Flight flight = new Flight(airportFrom, airportTo, flightData.getName(), flightData.getWeight());
+            flight.setMouseTransparent(true);
+            flights.add(flight);
+            pane.getChildren().add(flight);
           }
-          graph.connect(airportFrom, airportTo, airportFrom.getName() + "-" + airportFrom.getName(), 1);
-          Flight flight = new Flight(airportFrom, airportTo, flightData.getName(), flightData.getWeight());
-          flights.add(flight);
-          weightLabel.setText("FLIGHT");
-          pane.getChildren().add(flight);
-        } else{
+        } catch (EOFException e) {
+          in.close();
+          file.close();
           break;
         }
       }
 
-      in.close();
-      file.close();
     } catch (FileNotFoundException e) {
       Alert alert = new Alert(Alert.AlertType.ERROR, "Can't open file " + fileName + "!");
       alert.showAndWait();
