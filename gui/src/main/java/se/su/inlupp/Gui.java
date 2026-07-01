@@ -531,10 +531,10 @@ public class Gui extends Application {
               airportTo = airport;
             }
           }
-          weightLabel.setText("FLIGHT");
-          graph.connect(airportFrom, airportTo, firstAirport.getName() + "-" + secondAirport.getName(), 1);
+          graph.connect(airportFrom, airportTo, airportFrom.getName() + "-" + airportFrom.getName(), 1);
           Flight flight = new Flight(airportFrom, airportTo, flightData.getName(), flightData.getWeight());
           flights.add(flight);
+          weightLabel.setText("FLIGHT");
           pane.getChildren().add(flight);
         } else{
           break;
