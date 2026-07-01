@@ -24,6 +24,8 @@ import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
 
 import java.io.Serializable;
+import java.net.URI;
+import java.net.URL;
 import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
@@ -475,8 +477,8 @@ public class Gui extends Application {
       for (FlightData flightData : flightsData) {
         out.writeObject(flightData);
       }
-      // out.writeObject(airportsData);
-      // out.writeObject(flightsData);
+       
+      out.writeObject(image.getUrl());
 
       out.close();
       file.close();
@@ -517,6 +519,7 @@ public class Gui extends Application {
   }
 
   public void load(String fileName) {
+    pane.getChildren().add(imageView);
     try {
       FileInputStream file = new FileInputStream(fileName);
       ObjectInputStream in = new ObjectInputStream(file);
@@ -545,6 +548,9 @@ public class Gui extends Application {
             flight.setMouseTransparent(true);
             flights.add(flight);
             pane.getChildren().add(flight);
+          } else if (dataObject instanceof String url) {
+            Image newImage = new Image(url);
+            resizeImage(newImage); 
           }
         } catch (EOFException e) {
           in.close();
