@@ -2,6 +2,8 @@ package se.su.inlupp;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
@@ -23,14 +25,17 @@ import javafx.stage.FileChooser;
 
 import java.io.Serializable;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.security.Key;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import javafx.geometry.Rectangle2D;
 import javafx.stage.Screen;
@@ -41,14 +46,14 @@ import javafx.scene.input.KeyEvent;
 public class Gui extends Application {
 
   private Pane pane;
-  private ToggleButton addAirportButton, saveRouteButton, exitButton, connectAirportsButton, removeAirportButton,
+  private ToggleButton addAirportButton, saveFlightsButton, exitButton, connectAirportsButton, removeAirportButton,
       removeColorButton,
-      useBFSAlgorithmButton, useDFSAlgorithmButton, showRouteButton, loadRouteButton, loadMapButton;
+      useBFSAlgorithmButton, useDFSAlgorithmButton, showRouteButton, loadFlightsButton, loadMapButton;
   private TextField textField;
   private Label weightLabel;
 
   private Graph<Airport> graph;
-  private List<EdgeGUI> flights;
+  private List<Flight> flights;
   private DFSPathFinder<Airport> dfsPathFinder = new DFSPathFinder<>();
   private BFSPathFinder<Airport> bfsPathFinder = new BFSPathFinder<>();
 
@@ -74,6 +79,7 @@ public class Gui extends Application {
 
   @Override
   public void start(Stage stage) {
+    this.stage = stage;
     graph = new ListGraph<>();
     flights = new ArrayList<>();
 
@@ -90,8 +96,8 @@ public class Gui extends Application {
     useBFSAlgorithmButton = new ToggleButton("Use BFS algorithm [RED]");
     useDFSAlgorithmButton = new ToggleButton("Use DFS algorithm [BLUE]");
     showRouteButton = new ToggleButton("Show route");
-    loadRouteButton = new ToggleButton("Load route");
-    saveRouteButton = new ToggleButton("Save route");
+    loadFlightsButton = new ToggleButton("Load flights");
+    saveFlightsButton = new ToggleButton("Save flights");
     loadMapButton = new ToggleButton("Load Map");
     exitButton = new ToggleButton("Exit");
 
@@ -102,8 +108,8 @@ public class Gui extends Application {
     useBFSAlgorithmButton.setOnAction(new ButtonHandler());
     useDFSAlgorithmButton.setOnAction(new ButtonHandler());
     showRouteButton.setOnAction(new ButtonHandler());
-    loadRouteButton.setOnAction(new ButtonHandler());
-    saveRouteButton.setOnAction(new ButtonHandler());
+    loadFlightsButton.setOnAction(new ButtonHandler());
+    saveFlightsButton.setOnAction(new ButtonHandler());
     loadMapButton.setOnAction(new ButtonHandler());
     exitButton.setOnAction(new ButtonHandler());
 
@@ -116,8 +122,8 @@ public class Gui extends Application {
         useBFSAlgorithmButton,
         useDFSAlgorithmButton,
         showRouteButton,
-        loadRouteButton,
-        saveRouteButton,
+        loadFlightsButton,
+        saveFlightsButton,
         loadMapButton,
         weightLabel,
         exitButton);
@@ -129,8 +135,8 @@ public class Gui extends Application {
     useBFSAlgorithmButton.setToggleGroup(tools);
     useDFSAlgorithmButton.setToggleGroup(tools);
     showRouteButton.setToggleGroup(tools);
-    loadRouteButton.setToggleGroup(tools);
-    saveRouteButton.setToggleGroup(tools);
+    loadFlightsButton.setToggleGroup(tools);
+    saveFlightsButton.setToggleGroup(tools);
     loadMapButton.setToggleGroup(tools);
     exitButton.setToggleGroup(tools);
 
@@ -144,20 +150,8 @@ public class Gui extends Application {
 
     Scene scene = new Scene(root, 800, 800);
     stage.setScene(scene);
-    Rectangle2D screen = Screen.getPrimary().getVisualBounds();
+    resizeImage(image);
 
-    double maxWidth = screen.getWidth() * 0.9;
-    double maxHeight = screen.getHeight() * 0.9;
-
-    if (image.getWidth() > maxWidth || image.getHeight() > maxHeight){
-      imageView.setFitWidth(maxWidth);
-      imageView.setFitHeight(maxHeight);
-      imageView.setPreserveRatio(true);
-    }
-
-    stage.sizeToScene();
-    //imageView.fitWidthProperty().bind(stage.widthProperty());
-    //imageView.fitHeightProperty().bind(stage.heightProperty());
     stage.show();
   }
 
@@ -208,12 +202,12 @@ public class Gui extends Application {
         textField.setOnKeyPressed(new LoadMapHandler());
       }
 
-      if (source == saveRouteButton) {
+      if (source == saveFlightsButton) {
         new SaveHandler().handle(event);
       }
 
-      if (source == loadMapButton) {
-
+      if (source == loadFlightsButton) {
+        new LoadHandler().handle(event);
       }
 
       if (source == exitButton) {
@@ -257,7 +251,7 @@ public class Gui extends Application {
 
       for (Edge<Airport> flightInPath : flightsInPath) {
 
-        for (EdgeGUI flight : flights) {
+        for (Flight flight : flights) {
 
           if (flight.getName().equals(flightInPath.getName())) {
             flight.setColor(color);
@@ -292,7 +286,7 @@ public class Gui extends Application {
               + secondAirport.getName(),
           1);
 
-      EdgeGUI edge = new EdgeGUI(
+      Flight edge = new Flight(
           firstAirport,
           secondAirport,
           firstAirport.getName()
@@ -346,7 +340,10 @@ public class Gui extends Application {
     @Override
     public void handle(KeyEvent event) {
       if (event.getCode() == KeyCode.ENTER) {
-        imageView.setImage(new Image(textField.getText()));
+        Image newImage = new Image(textField.getText());
+
+        resizeImage(newImage);
+
         textField.clear();
         textField.setDisable(true);
       }
@@ -363,6 +360,16 @@ public class Gui extends Application {
     }
   }
 
+  private class LoadHandler implements EventHandler<ActionEvent> {
+    @Override
+    public void handle(ActionEvent event) {
+      File file = fileChooser.showOpenDialog(stage);
+      if (file != null) {
+        load(file.getAbsolutePath());
+      }
+    }
+  }
+
   public void showErrorMessage(String message) {
     Alert alert = new Alert(Alert.AlertType.ERROR);
     alert.setTitle("Error");
@@ -374,13 +381,13 @@ public class Gui extends Application {
 
   public void removeAirport(Airport airport) {
 
-    // Ta bort alla EdgeGUI som är kopplade
-    pane.getChildren().removeIf(node -> node instanceof EdgeGUI edge &&
+    // Ta bort alla Flight som är kopplade
+    pane.getChildren().removeIf(node -> node instanceof Flight edge &&
         (edge.getFrom() == airport ||
             edge.getTo() == airport));
 
     // Tar bort alla flights som är kopplade
-    flights.removeIf(node -> node instanceof EdgeGUI edge &&
+    flights.removeIf(node -> node instanceof Flight edge &&
         (edge.getFrom() == airport ||
             edge.getTo() == airport));
 
@@ -425,30 +432,11 @@ public class Gui extends Application {
     for (Airport airport : graph) {
       airport.setColor(Color.BLACK);
     }
-    for (EdgeGUI flight : flights) {
+    for (Flight flight : flights) {
       flight.setColor(Color.BLACK);
     }
   }
-  /*private void save(String fileName) {
-    try {
-      FileOutputStream file = new FileOutputStream(fileName);
-      ObjectOutputStream out = new ObjectOutputStream(file);
-      out.writeObject(graph.getNodes());
-      out.writeObject(flights);
-      out.close();
-      file.close();
-    } catch (FileNotFoundException e) {
-      Alert alert = new Alert(Alert.AlertType.ERROR, "Can't open file!");
-      alert.showAndWait();
-    } catch (IOException e) {
-      e.printStackTrace();
 
-      Alert alert = new Alert(
-          Alert.AlertType.ERROR,
-          "IO-error " + e.getMessage());
-      alert.showAndWait();
-    }
-  } */
   private void save(String fileName) {
 
     try (FileOutputStream file = new FileOutputStream(fileName);
@@ -466,17 +454,26 @@ public class Gui extends Application {
 
       List<FlightData> flightsData = new ArrayList<>();
 
-      for (EdgeGUI flight : flights) {
+      for (Flight flight : flights) {
         flightsData.add(
             new FlightData(
                 flight.getName(),
                 flight.getFrom().getName(),
-                flight.getTo().getName(), 
+                flight.getTo().getName(),
                 flight.getWeight()));
       }
 
-      out.writeObject(airportsData);
-      out.writeObject(flightsData);
+      for (AirportData airportData : airportsData){
+        out.writeObject(airportData);
+      }
+      for (FlightData flightData : flightsData){
+        out.writeObject(flightData);
+      }
+      //out.writeObject(airportsData);
+      //out.writeObject(flightsData);
+
+      out.close();
+      file.close();
 
     } catch (FileNotFoundException e) {
       Alert alert = new Alert(Alert.AlertType.ERROR, "Can't open file!");
@@ -487,6 +484,73 @@ public class Gui extends Application {
       Alert alert = new Alert(Alert.AlertType.ERROR,
           "IO-error " + e.getMessage());
 
+      alert.showAndWait();
+    }
+  }
+
+  private void resizeImage(Image image) {
+
+    Rectangle2D screen = Screen.getPrimary().getVisualBounds();
+
+    double maxWidth = screen.getWidth() * 0.9;
+    double maxHeight = screen.getHeight() * 0.9;
+
+    imageView.setImage(image);
+
+    if (image.getWidth() > maxWidth || image.getHeight() > maxHeight) {
+      imageView.setFitWidth(maxWidth);
+      imageView.setFitHeight(maxHeight);
+    } else {
+      imageView.setFitWidth(image.getWidth());
+      imageView.setFitHeight(image.getHeight());
+    }
+
+    imageView.setPreserveRatio(true);
+
+    stage.sizeToScene();
+  }
+
+  public void load(String fileName) {
+    try {
+      FileInputStream file = new FileInputStream(fileName);
+      ObjectInputStream in = new ObjectInputStream(file);
+
+      Airport airportFrom = null;
+      Airport airportTo = null;
+
+      while (true){
+        if ((in.readObject() instanceof AirportData airportData)) {
+          Airport airport = new Airport(airportData.getName(), airportData.getX(), airportData.getY(), Gui.this);
+          graph.add(airport);
+          pane.getChildren().add(airport);
+        } else if (in.readObject() instanceof FlightData flightData) {
+          for (Airport airport : graph.getNodes()) {
+            if (flightData.getFrom().equals(airport.getName())) {
+              airportFrom = airport;
+            } else if (flightData.getTo().equals(airport.getName())) {
+              airportTo = airport;
+            }
+          }
+          weightLabel.setText("FLIGHT");
+          graph.connect(airportFrom, airportTo, firstAirport.getName() + "-" + secondAirport.getName(), 1);
+          Flight flight = new Flight(airportFrom, airportTo, flightData.getName(), flightData.getWeight());
+          flights.add(flight);
+          pane.getChildren().add(flight);
+        } else{
+          break;
+        }
+      }
+
+      in.close();
+      file.close();
+    } catch (FileNotFoundException e) {
+      Alert alert = new Alert(Alert.AlertType.ERROR, "Can't open file " + fileName + "!");
+      alert.showAndWait();
+    } catch (IOException e) {
+      Alert alert = new Alert(Alert.AlertType.ERROR, "IO-error " + e.getMessage());
+      alert.showAndWait();
+    } catch (ClassNotFoundException e) {
+      Alert alert = new Alert(Alert.AlertType.ERROR, "Can't find class " + e.getMessage());
       alert.showAndWait();
     }
   }

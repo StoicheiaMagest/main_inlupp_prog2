@@ -4,7 +4,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 
-public class EdgeGUI extends Pane implements Edge<Airport> {
+public class Flight extends Pane implements Edge<Airport> {
     private Airport from;
     private Airport to;
     private String name;
@@ -12,7 +12,7 @@ public class EdgeGUI extends Pane implements Edge<Airport> {
 
     private Line line;
 
-    public EdgeGUI(Airport from, Airport to, String name, int weight) {
+    public Flight(Airport from, Airport to, String name, int weight) {
         this.from = from;
         this.to = to;
         this.name = name;
