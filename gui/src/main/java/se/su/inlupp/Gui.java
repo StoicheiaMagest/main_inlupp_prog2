@@ -478,7 +478,7 @@ public class Gui extends Application {
         out.writeObject(flightData);
       }
        
-      out.writeObject(image.getUrl());
+      out.writeObject(imageView.getImage().getUrl());
 
       out.close();
       file.close();
