@@ -515,7 +515,7 @@ public class Gui extends Application {
 
     imageView.setPreserveRatio(true);
 
-    stage.sizeToScene();
+    //stage.sizeToScene();
   }
 
   public void load(String fileName) {
