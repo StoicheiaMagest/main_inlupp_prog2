@@ -18,7 +18,11 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
@@ -49,9 +53,9 @@ import javafx.scene.input.KeyEvent;
 public class Gui extends Application {
 
   private Pane pane;
-  private ToggleButton addAirportButton, saveFlightsButton, exitButton, connectAirportsButton, removeAirportButton,
+  private ToggleButton addAirportButton, connectAirportsButton, removeAirportButton,
       removeColorButton,
-      useBFSAlgorithmButton, useDFSAlgorithmButton, showRouteButton, loadFlightsButton, loadMapButton;
+      useBFSAlgorithmButton, useDFSAlgorithmButton, showRouteButton, loadMapButton;
   private TextField textField;
   private Label weightLabel;
 
@@ -60,11 +64,9 @@ public class Gui extends Application {
   private DFSPathFinder<Airport> dfsPathFinder = new DFSPathFinder<>();
   private BFSPathFinder<Airport> bfsPathFinder = new BFSPathFinder<>();
 
-  private boolean removeMode;
-  private boolean DFSMode;
+  private boolean removeMode, DFSMode;
 
-  private Airport firstAirport;
-  private Airport secondAirport;
+  private Airport firstAirport, secondAirport;
 
   private Color color;
 
@@ -78,6 +80,13 @@ public class Gui extends Application {
 
   private FileChooser fileChooser = new FileChooser();
 
+  
+  private VBox vBox;
+  
+  private MenuBar menuBar;
+  private Menu archiveMenu;
+  private MenuItem loadFlightsItem, saveFlightsItem, exitItem;
+
   private Stage stage;
 
   @Override
@@ -86,62 +95,22 @@ public class Gui extends Application {
     graph = new ListGraph<>();
     flights = new ArrayList<>();
 
-    textField = new TextField();
-    textField.setPromptText("Press button and enter text");
-    textField.setDisable(true);
+    createTextField();
 
     weightLabel = new Label();
 
-    addAirportButton = new ToggleButton("Add Airport");
-    connectAirportsButton = new ToggleButton("Connect Airports");
-    removeAirportButton = new ToggleButton("Remove Airport");
-    removeColorButton = new ToggleButton("Remove Color");
-    useBFSAlgorithmButton = new ToggleButton("Use BFS algorithm [RED]");
-    useDFSAlgorithmButton = new ToggleButton("Use DFS algorithm [BLUE]");
-    showRouteButton = new ToggleButton("Show route");
-    loadFlightsButton = new ToggleButton("Load flights");
-    saveFlightsButton = new ToggleButton("Save flights");
-    loadMapButton = new ToggleButton("Load Map");
-    exitButton = new ToggleButton("Exit");
+    createButtons();
+    activateButtons();
 
-    addAirportButton.setOnAction(new ButtonHandler());
-    removeAirportButton.setOnAction(new ButtonHandler());
-    removeColorButton.setOnAction(new ButtonHandler());
-    connectAirportsButton.setOnAction(new ButtonHandler());
-    useBFSAlgorithmButton.setOnAction(new ButtonHandler());
-    useDFSAlgorithmButton.setOnAction(new ButtonHandler());
-    showRouteButton.setOnAction(new ButtonHandler());
-    loadFlightsButton.setOnAction(new ButtonHandler());
-    saveFlightsButton.setOnAction(new ButtonHandler());
-    loadMapButton.setOnAction(new ButtonHandler());
-    exitButton.setOnAction(new ButtonHandler());
+    menuBar = new MenuBar();
 
-    VBox vBox = new VBox(10,
-        textField,
-        addAirportButton,
-        removeAirportButton,
-        removeColorButton,
-        connectAirportsButton,
-        useBFSAlgorithmButton,
-        useDFSAlgorithmButton,
-        showRouteButton,
-        loadFlightsButton,
-        saveFlightsButton,
-        loadMapButton,
-        weightLabel,
-        exitButton);
+    createVBox();
 
-    addAirportButton.setToggleGroup(tools);
-    removeAirportButton.setToggleGroup(tools);
-    removeColorButton.setToggleGroup(tools);
-    connectAirportsButton.setToggleGroup(tools);
-    useBFSAlgorithmButton.setToggleGroup(tools);
-    useDFSAlgorithmButton.setToggleGroup(tools);
-    showRouteButton.setToggleGroup(tools);
-    loadFlightsButton.setToggleGroup(tools);
-    saveFlightsButton.setToggleGroup(tools);
-    loadMapButton.setToggleGroup(tools);
-    exitButton.setToggleGroup(tools);
+    createMenu();
+
+    setToggleGroupForButtons();
+
+    
 
     pane = new Pane();
     pane.setPrefSize(500, 500);
@@ -205,12 +174,12 @@ public class Gui extends Application {
         textField.setOnKeyPressed(new LoadMapHandler());
       }
 
-      if (source == saveFlightsButton) {
+      if (source == saveFlightsItem) {
         new SaveHandler().handle(event);
       }
 
-      if (source == loadFlightsButton) {
-        for (Airport airport : graph.getNodes()){
+      if (source == loadFlightsItem) {
+        for (Airport airport : graph.getNodes()) {
           graph.remove(airport);
         }
         pane.getChildren().clear();
@@ -218,7 +187,7 @@ public class Gui extends Application {
         new LoadHandler().handle(event);
       }
 
-      if (source == exitButton) {
+      if (source == exitItem) {
         Platform.exit();
       }
     }
@@ -378,6 +347,10 @@ public class Gui extends Application {
     }
   }
 
+  //private class NewAirportDialog extends Dialog<Airport> {
+
+  //}
+
   public void showErrorMessage(String message) {
     Alert alert = new Alert(Alert.AlertType.ERROR);
     alert.setTitle("Error");
@@ -477,7 +450,7 @@ public class Gui extends Application {
       for (FlightData flightData : flightsData) {
         out.writeObject(flightData);
       }
-       
+
       out.writeObject(imageView.getImage().getUrl());
 
       out.close();
@@ -515,7 +488,7 @@ public class Gui extends Application {
 
     imageView.setPreserveRatio(true);
 
-    //stage.sizeToScene();
+    // stage.sizeToScene();
   }
 
   public void load(String fileName) {
@@ -524,11 +497,10 @@ public class Gui extends Application {
       FileInputStream file = new FileInputStream(fileName);
       ObjectInputStream in = new ObjectInputStream(file);
 
-      
       while (true) {
         try {
           Object dataObject = in.readObject();
-          
+
           if ((dataObject instanceof AirportData airportData)) {
             Airport airport = new Airport(airportData.getName(), airportData.getX(), airportData.getY(), Gui.this);
             graph.add(airport);
@@ -550,7 +522,7 @@ public class Gui extends Application {
             pane.getChildren().add(flight);
           } else if (dataObject instanceof String url) {
             Image newImage = new Image(url);
-            resizeImage(newImage); 
+            resizeImage(newImage);
           }
         } catch (EOFException e) {
           in.close();
@@ -570,6 +542,77 @@ public class Gui extends Application {
       alert.showAndWait();
     }
   }
+
+  private void createTextField(){
+      textField = new TextField();
+      textField.setPromptText("Press button and enter text");
+      textField.setDisable(true);
+  }
+
+  private void createButtons() {
+    addAirportButton = new ToggleButton("Add Airport");
+    connectAirportsButton = new ToggleButton("Connect Airports");
+    removeAirportButton = new ToggleButton("Remove Airport");
+    removeColorButton = new ToggleButton("Remove Color");
+    useBFSAlgorithmButton = new ToggleButton("Use BFS algorithm [RED]");
+    useDFSAlgorithmButton = new ToggleButton("Use DFS algorithm [BLUE]");
+    showRouteButton = new ToggleButton("Show route");
+    loadMapButton = new ToggleButton("Load Map");
+  }
+
+  private void activateButtons(){
+    addAirportButton.setOnAction(new ButtonHandler());
+    removeAirportButton.setOnAction(new ButtonHandler());
+    removeColorButton.setOnAction(new ButtonHandler());
+    connectAirportsButton.setOnAction(new ButtonHandler());
+    useBFSAlgorithmButton.setOnAction(new ButtonHandler());
+    useDFSAlgorithmButton.setOnAction(new ButtonHandler());
+    showRouteButton.setOnAction(new ButtonHandler());
+    loadMapButton.setOnAction(new ButtonHandler());
+  }
+
+  private void createVBox() {
+      vBox = new VBox(10,
+          menuBar,
+          textField,
+          addAirportButton,
+          removeAirportButton,
+          removeColorButton,
+          connectAirportsButton,
+          useBFSAlgorithmButton,
+          useDFSAlgorithmButton,
+          showRouteButton,
+          loadMapButton,
+          weightLabel);
+    }
+
+    private void setToggleGroupForButtons() {
+      addAirportButton.setToggleGroup(tools);
+      removeAirportButton.setToggleGroup(tools);
+      removeColorButton.setToggleGroup(tools);
+      connectAirportsButton.setToggleGroup(tools);
+      useBFSAlgorithmButton.setToggleGroup(tools);
+      useDFSAlgorithmButton.setToggleGroup(tools);
+      showRouteButton.setToggleGroup(tools);
+      loadMapButton.setToggleGroup(tools);
+    }
+
+    private void createMenu() {
+      archiveMenu = new Menu("Archive");
+      menuBar.getMenus().add(archiveMenu);
+  
+      loadFlightsItem = new MenuItem("Load flights");
+      saveFlightsItem = new MenuItem("Save flights");
+      exitItem = new MenuItem("Exit");
+
+      archiveMenu.getItems().add(loadFlightsItem);
+      archiveMenu.getItems().add(saveFlightsItem);
+      archiveMenu.getItems().add(exitItem);
+
+      loadFlightsItem.setOnAction((new ButtonHandler()));
+      saveFlightsItem.setOnAction((new ButtonHandler()));
+      exitItem.setOnAction((new ButtonHandler()));
+    }
 
   public static void main(String[] args) {
     launch(args);
