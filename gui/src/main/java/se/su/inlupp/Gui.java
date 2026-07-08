@@ -61,7 +61,6 @@ public class Gui extends Application {
   private ToggleButton addAirportButton, connectAirportsButton, removeAirportButton,
       removeColorButton,
       useBFSAlgorithmButton, useDFSAlgorithmButton, showRouteButton, loadMapButton;
-  private TextField textField;
   private Label weightLabel;
 
   private Graph<Airport> graph;
@@ -85,9 +84,8 @@ public class Gui extends Application {
 
   private FileChooser fileChooser = new FileChooser();
 
-  
   private VBox vBox;
-  
+
   private MenuBar menuBar;
   private Menu archiveMenu;
   private MenuItem loadFlightsItem, saveFlightsItem, exitItem;
@@ -99,8 +97,6 @@ public class Gui extends Application {
     this.stage = stage;
     graph = new ListGraph<>();
     flights = new ArrayList<>();
-
-    createTextField();
 
     weightLabel = new Label();
 
@@ -114,8 +110,6 @@ public class Gui extends Application {
     createMenu();
 
     setToggleGroupForButtons();
-
-    
 
     pane = new Pane();
     pane.setPrefSize(500, 500);
@@ -143,7 +137,7 @@ public class Gui extends Application {
       Airport.setRemoveMode(false);
 
       if (source == addAirportButton) {
-        pane.setOnMouseClicked(new PutAirportOnMapHandler());              
+        pane.setOnMouseClicked(new PutAirportOnMapHandler());
       }
 
       if (source == removeAirportButton) {
@@ -172,9 +166,7 @@ public class Gui extends Application {
       }
 
       if (source == loadMapButton) {
-        textField.setPromptText("URL for background image");
-        textField.setDisable(false);
-        textField.setOnKeyPressed(new LoadMapHandler());
+        new LoadMapHandler().handle(event);
       }
 
       if (source == saveFlightsItem) {
@@ -290,15 +282,19 @@ public class Gui extends Application {
 
     @Override
     public void handle(MouseEvent event) {
-      new AirportDialog();
-      String airportName = AirportDialog.setResultConverter(OK || CANCEL);
+      String airportName = new AirportDialog()
+          .showAndWait()
+          .orElse(null);
+
+      if (airportName == null || airportName.isBlank()) {
+        return;
+      }
+
       double x = event.getX();
       double y = event.getY();
-      String airportName = textField.getText();
 
       if (airportName == null || airportName.strip().isEmpty()) {
         showErrorMessage("The textfield can not be empty");
-        textField.setDisable(true);
         pane.setOnMouseClicked(null);
         return;
       }
@@ -308,25 +304,25 @@ public class Gui extends Application {
       graph.add(airport);
       pane.getChildren().add(airport);
 
-      textField.clear();
-      textField.setDisable(true);
-
       pane.setOnMouseClicked(null);
     }
   }
 
-  private class LoadMapHandler implements EventHandler<KeyEvent> {
+  private class LoadMapHandler implements EventHandler<ActionEvent>{
 
     @Override
-    public void handle(KeyEvent event) {
-      if (event.getCode() == KeyCode.ENTER) {
-        Image newImage = new Image(textField.getText());
+    public void handle(ActionEvent arg0) {
+      
+      String url = new MapDialog()
+            .showAndWait()
+            .orElse(null);
 
-        resizeImage(newImage);
-
-        textField.clear();
-        textField.setDisable(true);
+      if (url == null || url.isBlank()) {
+        return;
       }
+
+      Image newImage = new Image(url);
+      resizeImage(newImage);
     }
   }
 
@@ -375,15 +371,47 @@ public class Gui extends Application {
           } catch(Exception e) {
             return null;
           }
-      }
-        return null;});
+        }
+        return null;
+      });
+      
+      nameField.setPromptText("Enter airport name here");
+      nameField.setDisable(false);
     }
+  }
 
+  private class MapDialog extends Dialog<String> {
+    private TextField urlField = new TextField();
 
+    public MapDialog() {
+      setTitle("New Map");
+      setHeaderText(null);
 
-    textField.setPromptText("Enter airport name here");
-    textField.setDisable(false);
+      GridPane grid = new GridPane();
+      grid.setHgap(10);
+      grid.setVgap(5);
 
+      grid.addRow(0, new Label("URL"), urlField);
+
+      getDialogPane().setContent(grid);
+      getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+      setResultConverter(buttonType -> {
+        if (buttonType == buttonType.OK) {
+          try {
+            String url = urlField.getText();
+            return url;
+
+          } catch(Exception e) {
+            return null;
+          }
+        }
+        return null;
+      });
+      
+      urlField.setPromptText("Enter URL here");
+      urlField.setDisable(false);
+    }
   }
 
   public void showErrorMessage(String message) {
@@ -578,12 +606,6 @@ public class Gui extends Application {
     }
   }
 
-  private void createTextField(){
-      textField = new TextField();
-      textField.setPromptText("Press button and enter text");
-      textField.setDisable(true);
-  }
-
   private void createButtons() {
     addAirportButton = new ToggleButton("Add Airport");
     connectAirportsButton = new ToggleButton("Connect Airports");
@@ -595,7 +617,7 @@ public class Gui extends Application {
     loadMapButton = new ToggleButton("Load Map");
   }
 
-  private void activateButtons(){
+  private void activateButtons() {
     addAirportButton.setOnAction(new ButtonHandler());
     removeAirportButton.setOnAction(new ButtonHandler());
     removeColorButton.setOnAction(new ButtonHandler());
@@ -607,47 +629,46 @@ public class Gui extends Application {
   }
 
   private void createVBox() {
-      vBox = new VBox(10,
-          menuBar,
-          textField,
-          addAirportButton,
-          removeAirportButton,
-          removeColorButton,
-          connectAirportsButton,
-          useBFSAlgorithmButton,
-          useDFSAlgorithmButton,
-          showRouteButton,
-          loadMapButton,
-          weightLabel);
-    }
+    vBox = new VBox(10,
+        menuBar,
+        addAirportButton,
+        removeAirportButton,
+        removeColorButton,
+        connectAirportsButton,
+        useBFSAlgorithmButton,
+        useDFSAlgorithmButton,
+        showRouteButton,
+        loadMapButton,
+        weightLabel);
+  }
 
-    private void setToggleGroupForButtons() {
-      addAirportButton.setToggleGroup(tools);
-      removeAirportButton.setToggleGroup(tools);
-      removeColorButton.setToggleGroup(tools);
-      connectAirportsButton.setToggleGroup(tools);
-      useBFSAlgorithmButton.setToggleGroup(tools);
-      useDFSAlgorithmButton.setToggleGroup(tools);
-      showRouteButton.setToggleGroup(tools);
-      loadMapButton.setToggleGroup(tools);
-    }
+  private void setToggleGroupForButtons() {
+    addAirportButton.setToggleGroup(tools);
+    removeAirportButton.setToggleGroup(tools);
+    removeColorButton.setToggleGroup(tools);
+    connectAirportsButton.setToggleGroup(tools);
+    useBFSAlgorithmButton.setToggleGroup(tools);
+    useDFSAlgorithmButton.setToggleGroup(tools);
+    showRouteButton.setToggleGroup(tools);
+    loadMapButton.setToggleGroup(tools);
+  }
 
-    private void createMenu() {
-      archiveMenu = new Menu("Archive");
-      menuBar.getMenus().add(archiveMenu);
-  
-      loadFlightsItem = new MenuItem("Load flights");
-      saveFlightsItem = new MenuItem("Save flights");
-      exitItem = new MenuItem("Exit");
+  private void createMenu() {
+    archiveMenu = new Menu("Archive");
+    menuBar.getMenus().add(archiveMenu);
 
-      archiveMenu.getItems().add(loadFlightsItem);
-      archiveMenu.getItems().add(saveFlightsItem);
-      archiveMenu.getItems().add(exitItem);
+    loadFlightsItem = new MenuItem("Load flights");
+    saveFlightsItem = new MenuItem("Save flights");
+    exitItem = new MenuItem("Exit");
 
-      loadFlightsItem.setOnAction((new ButtonHandler()));
-      saveFlightsItem.setOnAction((new ButtonHandler()));
-      exitItem.setOnAction((new ButtonHandler()));
-    }
+    archiveMenu.getItems().add(loadFlightsItem);
+    archiveMenu.getItems().add(saveFlightsItem);
+    archiveMenu.getItems().add(exitItem);
+
+    loadFlightsItem.setOnAction((new ButtonHandler()));
+    saveFlightsItem.setOnAction((new ButtonHandler()));
+    exitItem.setOnAction((new ButtonHandler()));
+  }
 
   public static void main(String[] args) {
     launch(args);
