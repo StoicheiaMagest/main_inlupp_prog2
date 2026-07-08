@@ -12,12 +12,14 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
@@ -44,6 +46,9 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import javax.xml.transform.OutputKeys;
+
 import javafx.geometry.Rectangle2D;
 import javafx.stage.Screen;
 
@@ -138,9 +143,7 @@ public class Gui extends Application {
       Airport.setRemoveMode(false);
 
       if (source == addAirportButton) {
-        textField.setPromptText("Enter airport name here");
-        textField.setDisable(false);
-        pane.setOnMouseClicked(new PutAirportOnMapHandler());
+        pane.setOnMouseClicked(new PutAirportOnMapHandler());              
       }
 
       if (source == removeAirportButton) {
@@ -287,10 +290,10 @@ public class Gui extends Application {
 
     @Override
     public void handle(MouseEvent event) {
-
+      new AirportDialog();
+      String airportName = AirportDialog.setResultConverter(OK || CANCEL);
       double x = event.getX();
       double y = event.getY();
-
       String airportName = textField.getText();
 
       if (airportName == null || airportName.strip().isEmpty()) {
@@ -347,9 +350,41 @@ public class Gui extends Application {
     }
   }
 
-  //private class NewAirportDialog extends Dialog<Airport> {
+  private class AirportDialog extends Dialog<String> {
+    private TextField nameField = new TextField();
 
-  //}
+    public AirportDialog() {
+      setTitle("New airport");
+      setHeaderText(null);
+
+      GridPane grid = new GridPane();
+      grid.setHgap(10);
+      grid.setVgap(5);
+
+      grid.addRow(0, new Label("Airport"), nameField);
+
+      getDialogPane().setContent(grid);
+      getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+      setResultConverter(buttonType -> {
+        if (buttonType == buttonType.OK) {
+          try {
+            String name = nameField.getText();
+            return name;
+
+          } catch(Exception e) {
+            return null;
+          }
+      }
+        return null;});
+    }
+
+
+
+    textField.setPromptText("Enter airport name here");
+    textField.setDisable(false);
+
+  }
 
   public void showErrorMessage(String message) {
     Alert alert = new Alert(Alert.AlertType.ERROR);
