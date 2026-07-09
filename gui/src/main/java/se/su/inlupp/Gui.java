@@ -250,21 +250,34 @@ public class Gui extends Application {
         return;
       }
 
+      String nameAndWeight = new ConnectAirportsDialog()
+          .showAndWait()
+          .orElse(null);
+
+      if (nameAndWeight == null) {
+        return;
+      }
+
+      String[] array = nameAndWeight.split(" ");
+      String name = array[0];
+      int weight = Integer.parseInt(array[1]);
+
+      /*
+      String name = nameAndWeight.split(" ")[0];
+      int weight = Integer.parseInt(nameAndWeight.split(" ")[1]);
+      */
+
       graph.connect(
           firstAirport,
           secondAirport,
-          firstAirport.getName()
-              + "-"
-              + secondAirport.getName(),
-          1);
+          name,
+          weight);
 
       Flight flight = new Flight(
           firstAirport,
           secondAirport,
-          firstAirport.getName()
-              + "-"
-              + secondAirport.getName(),
-          1);
+          name,
+          weight);
 
       flight.setMouseTransparent(true);
 
@@ -363,20 +376,73 @@ public class Gui extends Application {
       getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
       setResultConverter(buttonType -> {
-        if (buttonType == buttonType.OK) {
-          try {
-            String name = nameField.getText();
-            return name;
+        if (buttonType == ButtonType.OK) {
 
-          } catch(Exception e) {
-            return null;
-          }
+            String name = nameField.getText();
+
+            if (name.isBlank()) {
+                showErrorMessage("Name-field cannot be empty");
+                return null;
+            }
+
+            return name;
         }
         return null;
       });
       
       nameField.setPromptText("Enter airport name here");
       nameField.setDisable(false);
+    }
+  }
+
+  private class ConnectAirportsDialog extends Dialog<String> {
+    private TextField nameField = new TextField();
+    private TextField weightField = new TextField();
+
+    public ConnectAirportsDialog() {
+      setTitle("New flight");
+      setHeaderText(null);
+
+      
+      GridPane grid = new GridPane();
+      grid.setHgap(10);
+      grid.setVgap(5);
+      
+      grid.addRow(0, new Label("Flight"), nameField);
+      grid.addRow(1, new Label("Weight"), weightField);
+      
+      getDialogPane().setContent(grid);
+      getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+      
+      setResultConverter(buttonType -> {
+        if (buttonType == ButtonType.OK) {
+
+            String name = nameField.getText();
+            String weightText = weightField.getText();
+            int weight = 1;
+
+            try{
+              weight = Integer.parseInt(weightText);
+            } catch (NumberFormatException e){
+              weightText = "1";
+            }
+            
+            if (weight < 0){
+              showErrorMessage("Weight cannot be negative");
+              return null;
+            }
+            
+            if (name.isBlank()) {
+              name = firstAirport.getName() + "-" + secondAirport.getName();
+            }
+            
+            return name + " " + weightText;
+          }
+          return null;
+        });
+        
+      nameField.setPromptText(firstAirport.getName() + "-" + secondAirport.getName());
+      weightField.setPromptText("1");
     }
   }
 
@@ -397,15 +463,18 @@ public class Gui extends Application {
       getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
       setResultConverter(buttonType -> {
-        if (buttonType == buttonType.OK) {
-          try {
-            String url = urlField.getText();
-            return url;
+        if (buttonType == ButtonType.OK) {
 
-          } catch(Exception e) {
-            return null;
-          }
+            String url = urlField.getText();
+
+            if (url.isBlank()) {
+                showErrorMessage("URL-field cannot be empty");
+                return null;
+            }
+
+            return url;
         }
+
         return null;
       });
       
