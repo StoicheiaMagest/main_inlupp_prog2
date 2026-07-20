@@ -56,7 +56,6 @@ public class Airport extends Pane implements Node<String>, Comparable<Airport> {
 
             if (removeMode) {
                 gui.removeAirport(Airport.this);
-
                 event.consume();
                 return;
             }
@@ -75,6 +74,7 @@ public class Airport extends Pane implements Node<String>, Comparable<Airport> {
 
             setLayoutX(getLayoutX() + event.getX() - dragOffsetX);
             setLayoutY(getLayoutY() + event.getY() - dragOffsetY);
+            gui.setChanged(true);
         }
     }
 

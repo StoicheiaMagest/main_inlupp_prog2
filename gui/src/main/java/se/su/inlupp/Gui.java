@@ -70,7 +70,7 @@ public class Gui extends Application {
   private DFSPathFinder<Airport> dfsPathFinder = new DFSPathFinder<>();
   private BFSPathFinder<Airport> bfsPathFinder = new BFSPathFinder<>();
 
-  private boolean removeMode, DFSMode;
+  private boolean removeMode, DFSMode, changed;
 
   private Airport firstAirport, secondAirport;
 
@@ -265,11 +265,6 @@ public class Gui extends Application {
       String name = array[0];
       int weight = Integer.parseInt(array[1]);
 
-      /*
-      String name = nameAndWeight.split(" ")[0];
-      int weight = Integer.parseInt(nameAndWeight.split(" ")[1]);
-      */
-
       graph.connect(
           firstAirport,
           secondAirport,
@@ -286,6 +281,7 @@ public class Gui extends Application {
 
       flights.add(flight);
       pane.getChildren().add(flight);
+      setChanged(true);
 
       firstAirport = null;
       secondAirport = null;
@@ -319,6 +315,7 @@ public class Gui extends Application {
 
       graph.add(airport);
       pane.getChildren().add(airport);
+      setChanged(true);
 
       pane.setOnMouseClicked(null);
     }
@@ -339,6 +336,7 @@ public class Gui extends Application {
 
       Image newImage = new Image(url);
       resizeImage(newImage);
+      setChanged(true);
     }
   }
 
@@ -348,6 +346,7 @@ public class Gui extends Application {
       File file = fileChooser.showSaveDialog(stage);
       if (file != null) {
         save(file.getAbsolutePath());
+        setChanged(false);
       }
     }
   }
@@ -358,6 +357,7 @@ public class Gui extends Application {
       File file = fileChooser.showOpenDialog(stage);
       if (file != null) {
         load(file.getAbsolutePath());
+        setChanged(false);
       }
     }
   }
@@ -372,14 +372,15 @@ public class Gui extends Application {
   private class ExitHandler implements EventHandler<WindowEvent> {
     @Override
     public void handle(WindowEvent event) {
-      Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-      alert.setContentText("Unsaved changes, do you want to exit anyway?");
-      Optional<ButtonType> result = alert.showAndWait();
-      if (result.isPresent() && result.get().equals(ButtonType.CANCEL)) {
-        event.consume();
+      if (changed) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setContentText("Unsaved changes, do you want to exit anyway?");
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isPresent() && result.get().equals(ButtonType.CANCEL)) {
+          event.consume();
+        }
       }
-    }
-    
+    }  
   }
 
   private class AirportDialog extends Dialog<String> {
@@ -532,7 +533,7 @@ public class Gui extends Application {
 
     // Ta bort från grafen
     graph.remove(airport);
-    // pane.setOnMouseClicked(null);
+    setChanged(true);
   }
 
   private boolean selectAirports(MouseEvent event) {
@@ -760,6 +761,10 @@ public class Gui extends Application {
     loadFlightsItem.setOnAction((new ButtonHandler()));
     saveFlightsItem.setOnAction((new ButtonHandler()));
     exitItem.setOnAction((new ButtonHandler()));
+  }
+
+  public void setChanged(boolean changed) {
+    this.changed = changed;
   }
 
   public static void main(String[] args) {
