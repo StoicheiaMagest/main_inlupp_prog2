@@ -18,6 +18,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
@@ -45,6 +46,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.xml.transform.OutputKeys;
@@ -122,7 +124,7 @@ public class Gui extends Application {
     Scene scene = new Scene(root, 800, 800);
     stage.setScene(scene);
     resizeImage(image);
-
+    stage.setOnCloseRequest(new ExitHandler());
     stage.show();
   }
 
@@ -183,7 +185,7 @@ public class Gui extends Application {
       }
 
       if (source == exitItem) {
-        Platform.exit();
+        new ExitItemHandler().handle(event);
       }
     }
 
@@ -211,6 +213,7 @@ public class Gui extends Application {
       if (path == null) {
         firstAirport = null;
         secondAirport = null;
+        showErrorMessage("The airports in the selected route are not connected");
         return;
       }
 
@@ -357,6 +360,26 @@ public class Gui extends Application {
         load(file.getAbsolutePath());
       }
     }
+  }
+
+  private class ExitItemHandler implements EventHandler<ActionEvent> {
+    @Override
+    public void handle(ActionEvent event) {
+      stage.fireEvent(new WindowEvent(stage, WindowEvent.WINDOW_CLOSE_REQUEST));
+    }
+  } 
+
+  private class ExitHandler implements EventHandler<WindowEvent> {
+    @Override
+    public void handle(WindowEvent event) {
+      Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+      alert.setContentText("Unsaved changes, do you want to exit anyway?");
+      Optional<ButtonType> result = alert.showAndWait();
+      if (result.isPresent() && result.get().equals(ButtonType.CANCEL)) {
+        event.consume();
+      }
+    }
+    
   }
 
   private class AirportDialog extends Dialog<String> {
