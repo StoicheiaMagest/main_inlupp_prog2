@@ -120,25 +120,8 @@ public Edge<T> getEdgeBetween(T node1, T node2) {
 
   @Override
   public Iterator<T> iterator() {
-    return new MyIterator();
+    return getNodes().iterator();
   }
-
-  private class MyIterator implements Iterator<T> {
-    private int index = 0;
-
-    @Override
-    public T next() {
-      if (!hasNext()) {
-        throw new NoSuchElementException();
-      }
-      return nodes.get(index++);
-    }
-
-    @Override
-    public boolean hasNext() {
-      return index < nodes.size();
-    }
-  };
 
   @Override
   public String toString() {
