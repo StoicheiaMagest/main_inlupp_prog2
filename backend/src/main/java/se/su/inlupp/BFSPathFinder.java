@@ -1,10 +1,16 @@
+//PROG2 VT2026, Inlämningsuppgift, del 1
+//Grupp 198
+//Oliver Hellström Eriksson olhe2589
+//Stina Nilsén Börlin stni8969
+//Stoicheia Magest riro7563 
+
 package se.su.inlupp;
 import java.util.*;
 
 public class BFSPathFinder<T> implements PathFinder<T> {
 
-  public BFSPathFinder() {
-    }
+  protected BFSPathFinder() {
+  }
 
   @Override
   public Path<T> findPath(Graph<T> graph, T from, T to) {
@@ -45,7 +51,7 @@ public class BFSPathFinder<T> implements PathFinder<T> {
 
     nodes.addFirst(from);
 
-    return new PathClass<T>(path, nodes);    
+    return new PathClass<T>(path, nodes.getFirst());    
   }
 }
 

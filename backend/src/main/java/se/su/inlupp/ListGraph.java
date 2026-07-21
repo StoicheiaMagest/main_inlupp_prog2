@@ -1,28 +1,31 @@
+//PROG2 VT2026, Inlämningsuppgift, del 1
+//Grupp 198
+//Oliver Hellström Eriksson olhe2589
+//Stina Nilsén Börlin stni8969
+//Stoicheia Magest riro7563 
+
 package se.su.inlupp;
 
 import java.util.*;
 
 public class ListGraph<T> implements Graph<T> {
-  private List<T> nodes = new ArrayList<>(); // Store vertices
-  private Map<T, List<Edge<T>>> neighbours = new HashMap<>(); // Adjacency Edge lists
-  private List<List<Integer>> edges = new ArrayList<>();
+  private List<T> nodes = new ArrayList<>(); 
+  private Map<T, List<Edge<T>>> neighbours = new HashMap<>(); 
 
-  // construct an empty graph without parameters
-  public ListGraph() {
+  protected ListGraph() {
   }
 
-  @Override // Add a vertex to the graph
+  @Override 
   public void add(T node) {
     if (!hasNode(node)) {
       nodes.add(node);
       List<Edge<T>> edgesFromNode = new ArrayList<Edge<T>>();
       neighbours.put(node, edgesFromNode);
-      // edgesFromNode.add(); Kanske ska tas bort
     }
   }
 
- @Override
-public void remove(T node) {
+  @Override
+  public void remove(T node) {
     if (!hasNode(node)) {
         throw new NoSuchElementException();
     }
@@ -102,8 +105,8 @@ public void remove(T node) {
     return Collections.unmodifiableCollection(copyOfEdges);
   }
 
- @Override
-public Edge<T> getEdgeBetween(T node1, T node2) {
+  @Override
+  public Edge<T> getEdgeBetween(T node1, T node2) {
 
     if (!(hasNode(node1) && hasNode(node2))) {
         throw new NoSuchElementException();
@@ -116,7 +119,7 @@ public Edge<T> getEdgeBetween(T node1, T node2) {
     }
 
     return null;
-}
+  }
 
   @Override
   public Iterator<T> iterator() {

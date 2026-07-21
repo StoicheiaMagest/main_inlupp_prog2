@@ -1,3 +1,9 @@
+//PROG2 VT2026, Inlämningsuppgift, del 1
+//Grupp 198
+//Oliver Hellström Eriksson olhe2589
+//Stina Nilsén Börlin stni8969
+//Stoicheia Magest riro7563 
+
 package se.su.inlupp;
 
 import javafx.scene.layout.Pane;
@@ -9,10 +15,9 @@ public class Flight extends Pane implements Edge<Airport> {
     private Airport to;
     private String name;
     private int weight;
-
     private Line line;
 
-    public Flight(Airport from, Airport to, String name, int weight) {
+    protected Flight(Airport from, Airport to, String name, int weight) {
         this.from = from;
         this.to = to;
         this.name = name;
@@ -35,35 +40,35 @@ public class Flight extends Pane implements Edge<Airport> {
                 to.layoutYProperty().add(to.getRadius()));
     }
 
-    public Line getLine() {
+    protected Line getLine() {
         return line;
     }
 
-    public Airport getFrom() {
+    protected Airport getFrom() {
         return from;
     }
 
-    public Airport getTo() {
-        return to;
-    }
-
+    @Override
     public int getWeight() {
         return weight;
     };
 
+    @Override
     public void setWeight(int weight) {
         this.weight = weight;
     };
 
+    @Override
     public Airport getDestination() {
         return to;
     };
 
+    @Override
     public String getName() {
         return name;
     };
 
-    public void setColor(Color color){
+    protected void setColor(Color color){
         line.setStroke(color);
     }
 }

@@ -1,37 +1,53 @@
+//PROG2 VT2026, Inlämningsuppgift, del 1
+//Grupp 198
+//Oliver Hellström Eriksson olhe2589
+//Stina Nilsén Börlin stni8969
+//Stoicheia Magest riro7563 
+
 package se.su.inlupp;
 
 import java.util.*;
 
-public class PathClass<T> implements Path<T>{
+public class PathClass<T> implements Path<T> {
+    private T startNode; 
+
     private List<Edge<T>> edges = new ArrayList<>(); 
-    private List<T> nodes = new ArrayList<>();
     
-    public PathClass(List<Edge<T>> edges, List<T> nodes){
+    protected PathClass(List<Edge<T>> edges, T startNode){
         this.edges = edges;
-        this.nodes = nodes;
+        this.startNode = startNode;
     }
 
+    @Override
     public T getStart(){
-        return nodes.getFirst();
+        return startNode;
     }
 
+    @Override
     public T getEnd(){
-        return nodes.getLast();
+        return edges.getLast().getDestination();
     }
 
+    @Override
     public int getTotalWeight(){
         return edges.stream().mapToInt(e -> e.getWeight()).sum();
     }
 
-
+    @Override
     public List<Edge<T>> getEdges(){
         List<Edge<T>> copyOfPathOfEdges = new ArrayList<>(edges);
 
         return Collections.unmodifiableList(copyOfPathOfEdges);
     }
 
+    @Override
     public List<T> getNodes(){
-        List<T> copyOfPathOfNodes = new ArrayList<>(nodes);
+        List<T> copyOfPathOfNodes = new ArrayList<>();
+        copyOfPathOfNodes.add(getStart());
+
+        for (Edge<T> edge: edges) {
+            copyOfPathOfNodes.add(edge.getDestination());
+        }
 
         return Collections.unmodifiableList(copyOfPathOfNodes);
     }

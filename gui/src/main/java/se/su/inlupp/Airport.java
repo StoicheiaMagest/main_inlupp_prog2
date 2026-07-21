@@ -1,3 +1,9 @@
+//PROG2 VT2026, Inlämningsuppgift, del 1
+//Grupp 198
+//Oliver Hellström Eriksson olhe2589
+//Stina Nilsén Börlin stni8969
+//Stoicheia Magest riro7563 
+
 package se.su.inlupp;
 
 import javafx.event.EventHandler;
@@ -18,13 +24,13 @@ public class Airport extends Pane implements Node<String>, Comparable<Airport> {
 
     private Gui gui;
 
-    Circle circle;
-    Label label;
+    private Circle circle;
+    private Label label;
 
     private double dragOffsetX;
     private double dragOffsetY;
 
-    public Airport(String name, double x, double y, Gui gui) {
+    protected Airport(String name, double x, double y, Gui gui) {
         this.gui = gui;
         this.name = name;
 
@@ -46,7 +52,7 @@ public class Airport extends Pane implements Node<String>, Comparable<Airport> {
         setOnMouseDragged(new MouseDraggedHandler());
     }
 
-    public static void setRemoveMode(boolean mode) {
+    protected static void setRemoveMode(boolean mode) {
         removeMode = mode;
     }
 
@@ -83,11 +89,11 @@ public class Airport extends Pane implements Node<String>, Comparable<Airport> {
         return name;
     }
 
-    public double getX() {
+    protected double getX() {
         return getLayoutX();
     }
 
-    public double getY() {
+    protected double getY() {
         return getLayoutY();
     }
 
@@ -96,11 +102,11 @@ public class Airport extends Pane implements Node<String>, Comparable<Airport> {
         return name.compareTo(other.name);
     }
 
-    public int getRadius() {
+    protected int getRadius() {
         return NODE_RADIUS;
     }
 
-    public void setColor(Color color) {
+    protected void setColor(Color color) {
         circle.setFill(color);
     }
 }

@@ -1,9 +1,12 @@
+//PROG2 VT2026, Inlämningsuppgift, del 1
+//Grupp 198
+//Oliver Hellström Eriksson olhe2589
+//Stina Nilsén Börlin stni8969
+//Stoicheia Magest riro7563 
+
 package se.su.inlupp;
 
 import javafx.application.Application;
-import javafx.application.Platform;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
@@ -16,7 +19,6 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.scene.control.Alert;
@@ -29,10 +31,8 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
-
-import java.io.Serializable;
-import java.net.URI;
-import java.net.URL;
+import javafx.geometry.Rectangle2D;
+import javafx.stage.Screen;
 import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
@@ -41,56 +41,41 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.security.Key;
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
-
-import javax.xml.transform.OutputKeys;
-
-import javafx.geometry.Rectangle2D;
-import javafx.stage.Screen;
-
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 
 public class Gui extends Application {
 
   private Pane pane;
+  private BorderPane root;
+  private VBox vBox;
+
+  private Image image = new Image("https://m.media-amazon.com/images/I/71Z115aCqqL._AC_SL1500_.jpg");
+  private ImageView imageView = new ImageView(image);
+
+  private ToggleGroup tools = new ToggleGroup();
   private ToggleButton addAirportButton, connectAirportsButton, removeAirportButton,
-      removeColorButton,
-      useBFSAlgorithmButton, useDFSAlgorithmButton, showRouteButton, loadMapButton;
+      removeColorButton, useBFSAlgorithmButton, useDFSAlgorithmButton,
+      showRouteButton, loadMapButton;
   private Label weightLabel;
+
+  private MenuBar menuBar;
+  private Menu archiveMenu;
+  private MenuItem loadFlightsItem, saveFlightsItem, exitItem;
 
   private Graph<Airport> graph;
   private List<Flight> flights;
   private DFSPathFinder<Airport> dfsPathFinder = new DFSPathFinder<>();
   private BFSPathFinder<Airport> bfsPathFinder = new BFSPathFinder<>();
 
-  private boolean removeMode, DFSMode, changed;
-
   private Airport firstAirport, secondAirport;
 
   private Color color;
 
-  private ToggleGroup tools = new ToggleGroup();
-
-  private Image image = new Image("https://m.media-amazon.com/images/I/71Z115aCqqL._AC_SL1500_.jpg");
-
-  private BorderPane root;
-
-  private ImageView imageView = new ImageView(image);
+  private boolean removeMode, DFSMode, changed;
 
   private FileChooser fileChooser = new FileChooser();
-
-  private VBox vBox;
-
-  private MenuBar menuBar;
-  private Menu archiveMenu;
-  private MenuItem loadFlightsItem, saveFlightsItem, exitItem;
 
   private Stage stage;
 
@@ -176,7 +161,7 @@ public class Gui extends Application {
       }
 
       if (source == loadFlightsItem) {
-        for (Airport airport : graph.getNodes()) {
+        for (Airport airport : graph) {
           graph.remove(airport);
         }
         pane.getChildren().clear();
@@ -386,7 +371,7 @@ public class Gui extends Application {
   private class AirportDialog extends Dialog<String> {
     private TextField nameField = new TextField();
 
-    public AirportDialog() {
+    private AirportDialog() {
       setTitle("New airport");
       setHeaderText(null);
 
@@ -423,11 +408,10 @@ public class Gui extends Application {
     private TextField nameField = new TextField();
     private TextField weightField = new TextField();
 
-    public ConnectAirportsDialog() {
+    private ConnectAirportsDialog() {
       setTitle("New flight");
       setHeaderText(null);
-
-      
+ 
       GridPane grid = new GridPane();
       grid.setHgap(10);
       grid.setVgap(5);
@@ -473,7 +457,7 @@ public class Gui extends Application {
   private class MapDialog extends Dialog<String> {
     private TextField urlField = new TextField();
 
-    public MapDialog() {
+    private MapDialog() {
       setTitle("New Map");
       setHeaderText(null);
 
@@ -507,7 +491,7 @@ public class Gui extends Application {
     }
   }
 
-  public void showErrorMessage(String message) {
+  private void showErrorMessage(String message) {
     Alert alert = new Alert(Alert.AlertType.ERROR);
     alert.setTitle("Error");
     alert.setHeaderText("An error occurred");
@@ -516,17 +500,17 @@ public class Gui extends Application {
     alert.showAndWait();
   }
 
-  public void removeAirport(Airport airport) {
+  protected void removeAirport(Airport airport) {
 
     // Ta bort alla Flight som är kopplade
     pane.getChildren().removeIf(node -> node instanceof Flight flight &&
         (flight.getFrom() == airport ||
-            flight.getTo() == airport));
+            flight.getDestination() == airport));
 
     // Tar bort alla flights som är kopplade
     flights.removeIf(node -> node instanceof Flight flight &&
         (flight.getFrom() == airport ||
-            flight.getTo() == airport));
+            flight.getDestination() == airport));
 
     // Ta bort airport grafiskt
     pane.getChildren().remove(airport);
@@ -581,7 +565,7 @@ public class Gui extends Application {
 
       List<AirportData> airportsData = new ArrayList<>();
 
-      for (Airport airport : graph.getNodes()) {
+      for (Airport airport : graph) {
         airportsData.add(
             new AirportData(
                 airport.getName(),
@@ -596,7 +580,7 @@ public class Gui extends Application {
             new FlightData(
                 flight.getName(),
                 flight.getFrom().getName(),
-                flight.getTo().getName(),
+                flight.getDestination().getName(),
                 flight.getWeight()));
       }
 
@@ -664,10 +648,10 @@ public class Gui extends Application {
           } else if (dataObject instanceof FlightData flightData) {
             Airport airportFrom = null;
             Airport airportTo = null;
-            for (Airport airport : graph.getNodes()) {
+            for (Airport airport : graph) {
               if (flightData.getFrom().equals(airport.getName())) {
                 airportFrom = airport;
-              } else if (flightData.getTo().equals(airport.getName())) {
+              } else if (flightData.getDestination().equals(airport.getName())) {
                 airportTo = airport;
               }
             }
