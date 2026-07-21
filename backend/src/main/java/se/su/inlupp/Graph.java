@@ -8,7 +8,6 @@ package se.su.inlupp;
 
 import java.util.Collection;
 import java.util.Set;
-// git remote set-url  https://github.com/StoicheiaMagest/main_inlupp_prog2.git
 
 public interface Graph<T> extends Iterable<T> {
 

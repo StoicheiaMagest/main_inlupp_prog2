@@ -73,7 +73,7 @@ public class Gui extends Application {
 
   private Color color;
 
-  private boolean removeMode, DFSMode, changed;
+  private boolean DFSMode, changed;
 
   private FileChooser fileChooser = new FileChooser();
 
@@ -120,7 +120,6 @@ public class Gui extends Application {
 
       Object source = event.getSource();
 
-      removeMode = false;
       Airport.setRemoveMode(false);
 
       if (source == addAirportButton) {
@@ -128,7 +127,6 @@ public class Gui extends Application {
       }
 
       if (source == removeAirportButton) {
-        removeMode = true;
         Airport.setRemoveMode(true);
       }
 
@@ -627,11 +625,9 @@ public class Gui extends Application {
     }
 
     imageView.setPreserveRatio(true);
-
-    // stage.sizeToScene();
   }
 
-  public void load(String fileName) {
+  private void load(String fileName) {
     pane.getChildren().add(imageView);
     try {
       FileInputStream file = new FileInputStream(fileName);
@@ -747,7 +743,7 @@ public class Gui extends Application {
     exitItem.setOnAction((new ButtonHandler()));
   }
 
-  public void setChanged(boolean changed) {
+  protected void setChanged(boolean changed) {
     this.changed = changed;
   }
 

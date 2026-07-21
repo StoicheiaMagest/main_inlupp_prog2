@@ -45,13 +45,7 @@ public class BFSPathFinder<T> implements PathFinder<T> {
       current = next;
     }
 
-    LinkedList<T> nodes = new LinkedList<T>(path.stream()
-                        .map(e -> e.getDestination())
-                        .toList());
-
-    nodes.addFirst(from);
-
-    return new PathClass<T>(path, nodes.getFirst());    
+    return new PathClass<T>(path, from);    
   }
 }
 

@@ -23,7 +23,7 @@ public class DFSPathFinder<T> implements PathFinder<T> {
       return null;
     }
 
-    List<Edge<T>> path = new LinkedList<>(); //new LinkedList<>();
+    List<Edge<T>> path = new LinkedList<>();
 
     T current = to;
     while (current != null && !current.equals(from)) {
@@ -33,13 +33,7 @@ public class DFSPathFinder<T> implements PathFinder<T> {
       current = next;
     }
 
-    LinkedList<T> nodes = new LinkedList<>(path.stream()
-                        .map(e -> e.getDestination())
-                        .toList());
-
-    nodes.addFirst(from);
-
-    return new PathClass<T>(path, nodes.getFirst());  
+    return new PathClass<T>(path, from);  
   }
 
   private void connect(T to, T from, Map<T,T> connections, Graph<T> graph) {
