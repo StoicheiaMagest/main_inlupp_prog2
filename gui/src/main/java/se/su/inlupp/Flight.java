@@ -6,6 +6,8 @@
 
 package se.su.inlupp;
 
+import javafx.event.EventHandler;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
@@ -38,6 +40,22 @@ public class Flight extends Pane implements Edge<Airport> {
 
         line.endYProperty().bind(
                 to.layoutYProperty().add(to.getRadius()));
+        
+        line.setOnMousePressed(new MousePressedHandler());
+    }
+
+    private class MousePressedHandler implements EventHandler<MouseEvent> {
+        @Override
+        public void handle(MouseEvent event) {
+            Gui.setFlightLabelText("  Flight name:" + "\n" 
+            + "\n"
+            + "  " + from.getName() + "\n" 
+            + "  |" + "\n" 
+            + "  " + to.getName() + "\n" 
+            + "\n"
+            + "  Weight:" + "\n" 
+            + "  " + weight );
+        }
     }
 
     protected Line getLine() {

@@ -50,15 +50,16 @@ public class Gui extends Application {
   private Pane pane;
   private BorderPane root;
   private VBox vBox;
-
+  
   private Image image = new Image("https://m.media-amazon.com/images/I/71Z115aCqqL._AC_SL1500_.jpg");
   private ImageView imageView = new ImageView(image);
-
+  
   private ToggleGroup tools = new ToggleGroup();
   private ToggleButton addAirportButton, connectAirportsButton, removeAirportButton,
-      removeColorButton, useBFSAlgorithmButton, useDFSAlgorithmButton,
-      showRouteButton, loadMapButton;
+  removeColorButton, useBFSAlgorithmButton, useDFSAlgorithmButton,
+  showRouteButton, loadMapButton, clearTextButton;
   private Label weightLabel;
+  private static Label flightLabel;
 
   private MenuBar menuBar;
   private Menu archiveMenu;
@@ -91,6 +92,8 @@ public class Gui extends Application {
     activateButtons();
 
     menuBar = new MenuBar();
+    flightLabel = new Label("  Press a flight line to view" + "\n" + "  flight name and weight");
+    flightLabel.setMaxWidth(160);
 
     createVBox();
 
@@ -101,7 +104,7 @@ public class Gui extends Application {
     pane = new Pane();
     pane.setPrefSize(500, 500);
     pane.getChildren().add(imageView);
-
+    
     root = new BorderPane();
     root.setCenter(pane);
     root.setLeft(vBox);
@@ -152,6 +155,10 @@ public class Gui extends Application {
 
       if (source == loadMapButton) {
         new LoadMapHandler().handle(event);
+      }
+
+      if (source == clearTextButton) {
+        new ClearTextHandler().handle(event);
       }
 
       if (source == saveFlightsItem) {
@@ -260,7 +267,7 @@ public class Gui extends Application {
           name,
           weight);
 
-      flight.setMouseTransparent(true);
+      flight.setMouseTransparent(false);
 
       flights.add(flight);
       pane.getChildren().add(flight);
@@ -303,6 +310,13 @@ public class Gui extends Application {
       pane.setOnMouseClicked(null);
     }
   }
+
+  private class ClearTextHandler implements EventHandler<ActionEvent> {
+        @Override
+        public void handle(ActionEvent event) {
+            setFlightLabelText("  Press a flight line to view" + "\n" + "  flight name and weight");
+        }
+    }
 
   private class LoadMapHandler implements EventHandler<ActionEvent>{
 
@@ -653,7 +667,7 @@ public class Gui extends Application {
             }
             graph.connect(airportFrom, airportTo, flightData.getName(), flightData.getWeight());
             Flight flight = new Flight(airportFrom, airportTo, flightData.getName(), flightData.getWeight());
-            flight.setMouseTransparent(true);
+            flight.setMouseTransparent(false);
             flights.add(flight);
             pane.getChildren().add(flight);
           } else if (dataObject instanceof String url) {
@@ -688,6 +702,7 @@ public class Gui extends Application {
     useDFSAlgorithmButton = new ToggleButton("Use DFS algorithm [BLUE]");
     showRouteButton = new ToggleButton("Show route");
     loadMapButton = new ToggleButton("Load Map");
+    clearTextButton = new ToggleButton("Clear text");
   }
 
   private void activateButtons() {
@@ -699,6 +714,7 @@ public class Gui extends Application {
     useDFSAlgorithmButton.setOnAction(new ButtonHandler());
     showRouteButton.setOnAction(new ButtonHandler());
     loadMapButton.setOnAction(new ButtonHandler());
+    clearTextButton.setOnAction(new ButtonHandler());
   }
 
   private void createVBox() {
@@ -712,7 +728,9 @@ public class Gui extends Application {
         useDFSAlgorithmButton,
         showRouteButton,
         loadMapButton,
-        weightLabel);
+        clearTextButton,
+        weightLabel, 
+        flightLabel);
   }
 
   private void setToggleGroupForButtons() {
@@ -724,6 +742,7 @@ public class Gui extends Application {
     useDFSAlgorithmButton.setToggleGroup(tools);
     showRouteButton.setToggleGroup(tools);
     loadMapButton.setToggleGroup(tools);
+    clearTextButton.setToggleGroup(tools);
   }
 
   private void createMenu() {
@@ -741,6 +760,10 @@ public class Gui extends Application {
     loadFlightsItem.setOnAction((new ButtonHandler()));
     saveFlightsItem.setOnAction((new ButtonHandler()));
     exitItem.setOnAction((new ButtonHandler()));
+  }
+
+  protected static void setFlightLabelText(String text) {
+    flightLabel.setText(text);
   }
 
   protected void setChanged(boolean changed) {
