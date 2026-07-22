@@ -93,7 +93,7 @@ public class Gui extends Application {
 
     menuBar = new MenuBar();
     flightLabel = new Label("  Press a flight line to view" + "\n" + "  flight name and weight");
-    flightLabel.setMaxWidth(160);
+    flightLabel.setMaxWidth(150);
 
     createVBox();
 
