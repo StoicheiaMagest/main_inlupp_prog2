@@ -251,7 +251,7 @@ public class Gui extends Application {
         return;
       }
 
-      String[] array = nameAndWeight.split(" ");
+      String[] array = nameAndWeight.split(";");
       String name = array[0];
       int weight = Integer.parseInt(array[1]);
 
@@ -270,7 +270,7 @@ public class Gui extends Application {
       flight.setMouseTransparent(false);
 
       flights.add(flight);
-      pane.getChildren().add(flight);
+      pane.getChildren().add(1, flight);
       setChanged(true);
 
       firstAirport = null;
@@ -453,10 +453,14 @@ public class Gui extends Application {
             }
             
             if (name.isBlank()) {
-              name = firstAirport.getName() + "-" + secondAirport.getName();
+              //name = firstAirport.getName() + "-" + secondAirport.getName();
+
+              name = firstAirport.getName() + "\n" 
+                      + "  |" + "\n" 
+                      + "  " + secondAirport.getName();
             }
             
-            return name + " " + weightText;
+            return name + ";" + weightText;
           }
           return null;
         });

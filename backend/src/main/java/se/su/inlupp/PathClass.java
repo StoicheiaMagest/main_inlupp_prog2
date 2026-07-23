@@ -9,12 +9,11 @@ package se.su.inlupp;
 import java.util.*;
 
 public class PathClass<T> implements Path<T> {
-    private T startNode; 
-
-    private List<Edge<T>> edges = new ArrayList<>(); 
+    private final T startNode; 
+    private final List<Edge<T>> edges; 
     
     protected PathClass(List<Edge<T>> edges, T startNode){
-        this.edges = edges;
+        this.edges = Collections.unmodifiableList(new ArrayList<>(edges));
         this.startNode = startNode;
     }
 
@@ -35,9 +34,7 @@ public class PathClass<T> implements Path<T> {
 
     @Override
     public List<Edge<T>> getEdges(){
-        List<Edge<T>> copyOfPathOfEdges = new ArrayList<>(edges);
-
-        return Collections.unmodifiableList(copyOfPathOfEdges);
+        return edges;
     }
 
     @Override

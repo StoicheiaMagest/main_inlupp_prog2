@@ -49,9 +49,7 @@ public class Flight extends Pane implements Edge<Airport> {
         public void handle(MouseEvent event) {
             Gui.setFlightLabelText("  Flight name:" + "\n" 
             + "\n"
-            + "  " + from.getName() + "\n" 
-            + "  |" + "\n" 
-            + "  " + to.getName() + "\n" 
+            + "  " + name + "\n" 
             + "\n"
             + "  Weight:" + "\n" 
             + "  " + weight );

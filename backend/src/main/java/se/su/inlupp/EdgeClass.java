@@ -7,8 +7,8 @@
 package se.su.inlupp;
 
 public class EdgeClass<T> implements Edge<T> {
-    private T node;
-    private String name;
+    private final T node;
+    private final String name;
     private int weight;
 
     protected EdgeClass(T node, String name, int weight) {
