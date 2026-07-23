@@ -267,8 +267,6 @@ public class Gui extends Application {
           name,
           weight);
 
-      flight.setMouseTransparent(false);
-
       flights.add(flight);
       pane.getChildren().add(1, flight);
       setChanged(true);
@@ -276,7 +274,7 @@ public class Gui extends Application {
       firstAirport = null;
       secondAirport = null;
 
-      pane.setOnMouseClicked(null);
+      //pane.setOnMouseClicked(null);
     }
   }
 
@@ -453,8 +451,6 @@ public class Gui extends Application {
             }
             
             if (name.isBlank()) {
-              //name = firstAirport.getName() + "-" + secondAirport.getName();
-
               name = firstAirport.getName() + "\n" 
                       + "  |" + "\n" 
                       + "  " + secondAirport.getName();
@@ -671,9 +667,8 @@ public class Gui extends Application {
             }
             graph.connect(airportFrom, airportTo, flightData.getName(), flightData.getWeight());
             Flight flight = new Flight(airportFrom, airportTo, flightData.getName(), flightData.getWeight());
-            flight.setMouseTransparent(false);
             flights.add(flight);
-            pane.getChildren().add(flight);
+            pane.getChildren().add(1, flight);
           } else if (dataObject instanceof String url) {
             Image newImage = new Image(url);
             resizeImage(newImage);

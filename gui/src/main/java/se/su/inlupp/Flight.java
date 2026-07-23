@@ -12,12 +12,11 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 
-public class Flight extends Pane implements Edge<Airport> {
+public class Flight extends Line implements Edge<Airport> {
     private Airport from;
     private Airport to;
     private String name;
     private int weight;
-    private Line line;
 
     protected Flight(Airport from, Airport to, String name, int weight) {
         this.from = from;
@@ -25,39 +24,21 @@ public class Flight extends Pane implements Edge<Airport> {
         this.name = name;
         this.weight = weight;
 
-        this.line = new Line();
-
-        getChildren().add(line);
-
-        line.startXProperty().bind(
+        startXProperty().bind(
                 from.layoutXProperty().add(from.getRadius()));
 
-        line.startYProperty().bind(
+        startYProperty().bind(
                 from.layoutYProperty().add(from.getRadius()));
 
-        line.endXProperty().bind(
+        endXProperty().bind(
                 to.layoutXProperty().add(to.getRadius()));
 
-        line.endYProperty().bind(
+        endYProperty().bind(
                 to.layoutYProperty().add(to.getRadius()));
         
-        line.setOnMousePressed(new MousePressedHandler());
-    }
-
-    private class MousePressedHandler implements EventHandler<MouseEvent> {
-        @Override
-        public void handle(MouseEvent event) {
-            Gui.setFlightLabelText("  Flight name:" + "\n" 
-            + "\n"
-            + "  " + name + "\n" 
-            + "\n"
-            + "  Weight:" + "\n" 
-            + "  " + weight );
-        }
-    }
-
-    protected Line getLine() {
-        return line;
+        setOnMousePressed(event -> {
+            Gui.setFlightLabelText("Flight name:\n  " + name + "\n\nWeight:\n" + weight);
+        });
     }
 
     protected Airport getFrom() {
@@ -85,6 +66,6 @@ public class Flight extends Pane implements Edge<Airport> {
     };
 
     protected void setColor(Color color){
-        line.setStroke(color);
+        setStroke(color);
     }
 }
